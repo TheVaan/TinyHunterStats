@@ -17,10 +17,8 @@ local TinyHunterStatsBroker = ldb:NewDataObject("TinyHunterStats", {
 	label = "TinyHunterStats", 
 	icon = "Interface\\Icons\\Ability_Racial_ShadowMeld",
 	text = "--"
-	}
-	)
+	})
 
-	
 TinyHunterStats.fonts = {}
 
 TinyHunterStats.defaults = {
@@ -73,8 +71,8 @@ function TinyHunterStats:OnInitialize()
 	media.RegisterCallback(self, "LibSharedMedia_Registered")
 	
 	self:RegisterChatCommand("ths", function() AceConfigDialog:Open("TinyHunterStats") end)	
+	self:RegisterChatCommand("TinyHunterStats", function() AceConfigDialog:Open("TinyHunterStats") end)
 	self.optionsFrame = AceConfigDialog:AddToBlizOptions("TinyHunterStats", "TinyHunterStats")
-
 	self.db:RegisterDefaults(self.defaults)
 	local version = GetAddOnMetadata("TinyHunterStats","Version")
 	local loaded = L["Open the configuration menu with /ths"].."|r"
