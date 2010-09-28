@@ -1,4 +1,5 @@
 ## Interface: 30300
+## X-Compatible-With: 40000
 ## Title: TinyHunterStats
 ## Version: @project-version@
 ## Author: TheVaan and Irarrow
