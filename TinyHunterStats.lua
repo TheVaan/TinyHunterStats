@@ -1,5 +1,5 @@
 --         ------------------------------------------
---        |  TinyHunterStats by TheVaan and Irarrow  |
+--        |  TinyHunterStats by TheVaan and Marhu_  |
 --         ------------------------------------------
 --
 -- File version: @file-revision@
@@ -35,16 +35,17 @@ TinyHunterStats.defaults = {
 		HighestAp = 0,
 		HighestCrit = 0,
 		FastestRg = 500,
-		HighestArp = 0,
+		HighestFr = 0,
 		Style = {
 			Ap = true,
 			Crit = true,
 			Speed = false,
-			Arp = true,
+			Fr = true,
 			MaxAp = true,
 			MaxCrit = true,
 			MaxSpeed = false,
-			MaxArp = true
+			MaxFr = true,
+			LDBtext = true
 		},
 	}
 }
@@ -62,6 +63,28 @@ thsstring:SetPoint("CENTER", thsframe)
 thsstring:SetJustifyH("CENTER")
 thsstring:SetJustifyV("MIDDLE")
 
+function TinyHunterStats:SetDragScript()
+	if self.db.char.FrameLocked then
+		thsframe:SetMovable(false)
+		fixed = "|cffFF0000"..L["Text is fixed. Uncheck Lock Frame in the options to move!"].."|r"
+		thsframe:SetScript("OnDragStart", function() DEFAULT_CHAT_FRAME:AddMessage(fixed) end)
+	else
+		thsframe:SetMovable(true)
+		thsframe:SetScript("OnDragStart", function() thsframe:StartMoving() end)
+		thsframe:SetScript("OnDragStop", function()	thsframe:StopMovingOrSizing() self.db.char.xPosition = thsframe:GetLeft() self.db.char.yPosition = thsframe:GetBottom()	end)
+	end
+end
+
+function TinyHunterStats:InitializeFrame()
+	thsframe:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", self.db.char.xPosition, self.db.char.yPosition)
+	local font = media:Fetch("font", self.db.char.Font)
+	if not thsstring:SetFont(font, self.db.char.Size, self.db.char.FontEffect) then
+		thsstring:SetFont("Fonts\\FRIZQT__.TTF", self.db.char.Size, self.db.char.FontEffect)
+	end
+	self:SetDragScript()
+	self:Stats()
+end
+
 function TinyHunterStats:OnInitialize()
 	local AceConfigReg = LibStub("AceConfigRegistry-3.0")
 	local AceConfigDialog = LibStub("AceConfigDialog-3.0")
@@ -77,13 +100,14 @@ function TinyHunterStats:OnInitialize()
 	local version = GetAddOnMetadata("TinyHunterStats","Version")
 	local loaded = L["Open the configuration menu with /ths"].."|r"
 	DEFAULT_CHAT_FRAME:AddMessage("|cffffd700TinyHunterStats |cff00ff00~v"..version.."~|cffffd700: "..loaded)
+	
+	TinyHunterStatsBroker.OnClick = function(frame, button)	AceConfigDialog:Open("TinyHunterStats")	end
 end
 
 function TinyHunterStats:OnEnable()
 	self:LibSharedMedia_Registered()
+	self:InitializeFrame()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "OnEvent")
-	self:RegisterEvent("ADDON_LOADED", "OnEvent")
-	self:RegisterEvent("VARIABLES_LOADED", "OnEvent")
 	self:RegisterEvent("UNIT_ATTACK_SPEED", "OnEvent")
 	self:RegisterEvent("UNIT_RANGED_ATTACK_POWER", "OnEvent")
 	self:RegisterEvent("COMBAT_RATING_UPDATE", "OnEvent")
@@ -107,22 +131,18 @@ function TinyHunterStats:LibSharedMedia_Registered()
 end
 
 function TinyHunterStats:OnEvent(event, arg1)
-	if (event == "ADDON_LOADED") then
-		thsframe:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", self.db.char.xPosition, self.db.char.yPosition)
-		local font = media:Fetch("font", self.db.char.Font)
-		thsstring:SetFont(font, self.db.char.Size, self.db.char.FontEffect)
-	end
-		if ((event == "PLAYER_REGEN_ENABLED") or (event == "PLAYER_ENTERING_WORLD")) then
+	if ((event == "PLAYER_REGEN_ENABLED") or (event == "PLAYER_ENTERING_WORLD")) then
 		thsframe:SetAlpha(self.db.char.outOfCombatAlpha)
 	end
 	if (event == "PLAYER_REGEN_DISABLED") then
 		thsframe:SetAlpha(self.db.char.inCombatAlpha)
 	end
-	if (self.db.char.FrameLocked == true) then 
-		local fixed = L["Text is fixed. Uncheck Lock Frame in the options to move!"]
-		thsframe:SetScript("OnDragStart", function() DEFAULT_CHAT_FRAME:AddMessage(fixed) end)
+	if (event == "UNIT_AURA" and arg1 == "player") then
+		self:Stats()
 	end
-  	self:Stats()
+	if (event ~= "UNIT_AURA") then
+		self:Stats()
+	end
 end
 
 function TinyHunterStats:Stats()
@@ -131,7 +151,7 @@ function TinyHunterStats:Stats()
 	local pow = base + buff + debuff
 	local crit = string.format("%.2f", GetRangedCritChance("player"))
 	local speed = string.format("%.2f", UnitRangedDamage("player"))
-	local arp = string.format("%.2f", GetArmorPenetration("player"))
+	local fr = string.format("%.2f", GetPowerRegen() or 0)
 	local recordbrocken = L["Record broken!"]
 
 	if (tonumber(pow) > tonumber(self.db.char.HighestAp)) then
@@ -155,11 +175,11 @@ function TinyHunterStats:Stats()
 			DEFAULT_CHAT_FRAME:AddMessage("|cffFF0000"..L["Ranged Attack Speed"]..": |c00ffef00"..self.db.char.FastestRg.."|r")
 		end
 	end
-	if (tonumber(arp) > tonumber(self.db.char.HighestArp)) then
-		self.db.char.HighestArp = arp
+	if (tonumber(fr) > tonumber(self.db.char.HighestFr)) then
+		self.db.char.HighestFr = fr
 		if (self.db.char.RecordMsg == true) then
 			DEFAULT_CHAT_FRAME:AddMessage(recordbrocken)
-			DEFAULT_CHAT_FRAME:AddMessage("|cffFF0000"..L["Armor Penetration"]..": |c00ffef00"..self.db.char.HighestArp.."|r")
+			DEFAULT_CHAT_FRAME:AddMessage("|cffFF0000"..STAT_FOCUS_REGEN..": |c00ffef00"..self.db.char.HighestFr.."|r")
 		end
 	end
 			
@@ -177,11 +197,11 @@ function TinyHunterStats:Stats()
 		oldstat = stat
 		stat = oldstat.." |c000099FF"..speed.."s|r"
 	end
-	if (style.Arp == true) then
+	if (style.Fr == true) then
 		oldstat = stat
-		stat = oldstat.." |c000033CC"..arp.."%|r"
+		stat = oldstat.." |c000033CC"..fr.."|r"
 	end
-	if (style.MaxAp or style.MaxCrit or style.MaxSpeed or style.MaxHit or style.MaxArp) then
+	if (style.MaxAp or style.MaxCrit or style.MaxSpeed or style.MaxHit or style.MaxFr) then
 		oldstat = stat
 		stat = oldstat.."\n"
 	end
@@ -197,11 +217,15 @@ function TinyHunterStats:Stats()
 		oldstat = stat
 		stat = oldstat.." |c00666699"..self.db.char.FastestRg.."s|r"
 	end
-	if (style.MaxArp == true) then
+	if (style.MaxFr == true) then
 		oldstat = stat
-		stat = oldstat.." |c00003366"..self.db.char.HighestArp.."%|r"
+		stat = oldstat.." |c00003366"..self.db.char.HighestFr.."|r"
 	end
 	
 	thsstring:SetText(stat)
-	TinyHunterStatsBroker.text = stat
+	if (style.LDBtext) then
+		TinyHunterStatsBroker.text = stat
+	else
+		TinyHunterStatsBroker.text = ""
+	end
 end

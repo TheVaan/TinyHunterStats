@@ -1,8 +1,8 @@
-## Interface: 40000
+## Interface: 40300
 ## Title: TinyHunterStats
-## Version: @project-version@
-## Author: TheVaan and Irarrow
-## Notes: Shows your current Ranged Attack Power & Crit & Speed & Armor Penetration
+## Version: 1.0.4
+## Author: TheVaan & Marhu_
+## Notes: Shows your current Ranged Attack Power & Crit & Speed & Focus Regen.|n|cffeda55fBy TheVaan and Marhu_ |r
 ## SavedVariablesPerCharacter: TinyHunterStats
 ## OptionalDeps: LibStub, CallbackHandler-1.0, AceAddon-3.0, AceEvent-3.0, AceDB-3.0, AceLocale-3.0, AceConsole-3.0, AceGUI-3.0, AceConfig-3.0, LibSharedMedia-3.0
 
