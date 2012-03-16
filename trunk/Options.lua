@@ -157,6 +157,23 @@ function TinyHunterStats:Options()
 						end,
 						order = 8,
 					},
+					LDBtext = {
+						name = L["Broker Text"],
+						desc = L["Displays stats in the LDB text field."],
+						width = 'full',
+						type = 'toggle',
+						get = function() return self.db.char.Style.LDBtext end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.LDBtext = true
+							else
+								self.db.char.Style.LDBtext = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 9,
+					},
 				},
 			},
 			style = {
@@ -226,17 +243,17 @@ function TinyHunterStats:Options()
 						disabled = function() return InCombatLockdown() end,
 						order = 5,
 					},
-					arp = {
-						name = L["Armor Penetration"],
-						desc = L["Armor Penetration"].." "..L["show/hide"],
+					fr = {
+						name = STAT_FOCUS_REGEN,
+						desc = STAT_FOCUS_REGEN.." "..L["show/hide"],
 						width = 'full',
 						type = 'toggle',
-						get = function() return self.db.char.Style.Arp end,
+						get = function() return self.db.char.Style.Fr end,
 						set = function(info, value)				
 							if(value) then
-								self.db.char.Style.Arp = true
+								self.db.char.Style.Fr = true
 							else
-								self.db.char.Style.Arp = false
+								self.db.char.Style.Fr = false
 							end
 							self:Stats()
 						end,
@@ -294,17 +311,17 @@ function TinyHunterStats:Options()
 						disabled = function() return InCombatLockdown() end,
 						order = 9,
 					},
-					maxarp = {
-						name = L["Highest"].." "..L["Armor Penetration"],
-						desc = L["Highest"].." "..L["Armor Penetration"].." "..L["show/hide"],
+					maxfr = {
+						name = L["Highest"].." "..STAT_FOCUS_REGEN,
+						desc = L["Highest"].." "..STAT_FOCUS_REGEN.." "..L["show/hide"],
 						width = 'full',
 						type = 'toggle',
-						get = function() return self.db.char.Style.MaxArp end,
+						get = function() return self.db.char.Style.MaxFr end,
 						set = function(info, value)				
 							if(value) then
-								self.db.char.Style.MaxArp = true
+								self.db.char.Style.MaxFr = true
 							else
-								self.db.char.Style.MaxArp = false
+								self.db.char.Style.MaxFr = false
 							end
 							self:Stats()
 						end,
@@ -324,7 +341,7 @@ function TinyHunterStats:Options()
 							self.db.char.HighestAp = 0
 							self.db.char.HighestCrit = 0
 							self.db.char.FastestRg = 500
-							self.db.char.HighestArp = 0
+							self.db.char.HighestFr = 0
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,

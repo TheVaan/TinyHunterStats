@@ -1,0 +1,11 @@
+=== r10 ===
+
+* removed Armor Penetration and add Focus Regen
+* Frame Initialize fixed (before, many Initialize)
+* SetScript "OnDrag" when loaded addon
+ 
+* LDB 
+  ** add OnClick Handler to open Options
+   
+* Options
+  ** add option to display / hide stats in the LDB text field. 
