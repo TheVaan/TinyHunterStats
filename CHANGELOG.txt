@@ -1,4 +1,11 @@
-=== r10 ===
+=== r12 ===
+
+ * alignment with TinyMeleeStats
+ * add Color options
+ * add Record Sound
+ * add Hit Stat
+
+=== r11 ===
 
 * removed Armor Penetration and add Focus Regen
 * Frame Initialize fixed (before, many Initialize)
