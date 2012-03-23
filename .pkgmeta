@@ -24,6 +24,8 @@ externals:
     Libs/LibSharedMedia-3.0:
         url: svn://svn.wowace.com/wow/libsharedmedia-3-0/mainline/trunk
         tag: latest
+	Libs/AceGUI-3.0-SharedMediaWidgets:
+		svn://svn.wowace.com/wow/ace-gui-3-0-shared-media-widgets/mainline/trunk
 
 enable-nolib-creation: no
 

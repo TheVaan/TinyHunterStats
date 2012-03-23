@@ -87,7 +87,8 @@ TinyHunterStats.defaults = {
 				g = 0.9,
 				b = 0.9
 			}
-		}
+		},
+		DBver = 2
 	}
 }
 
@@ -259,7 +260,7 @@ function TinyHunterStats:OnEvent(event, arg1)
 end
 
 local function OldDB()
-	if not TinyCasterStats.db.char.DBver or TinyCasterStats.db.char.DBver < 2 then
+	if not TinyHunterStats.db.char.DBver or TinyHunterStats.db.char.DBver < 2 then
 		if SpecChangedPause <= GetTime() then
 			SpecChangedPause = GetTime() + 60
 			DEFAULT_CHAT_FRAME:AddMessage("|cffffd700"..AddonName..": Please /Reload UI (DB reset)|r")
