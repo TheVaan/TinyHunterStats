@@ -15,9 +15,11 @@ local ldb = LibStub:GetLibrary("LibDataBroker-1.1");
 local THSBroker = ldb:NewDataObject(AddonName, { 
 	type = "data source",
 	label = AddonName, 
-	icon = "Interface\\Icons\\Ability_Racial_ShadowMeld",
+	icon = "Interface\\Icons\\Ability_Hunter_SniperShot",
 	text = "--"
 	})
+
+local SpecChangedPause = GetTime()
 
 TinyHunterStats.fonts = {}
 
@@ -34,11 +36,20 @@ TinyHunterStats.defaults = {
 		RecordMsg = true,
 		RecordSound = false,
 		RecordSoundFile = "Fanfare3",
-		HighestAp = 0,
-		HighestCrit = 0,
-		FastestRg = 500,
-		HighestHit = "0.00",
-		HighestFr = 0,
+		Spec1 = {
+			HighestAp = 0,
+			HighestCrit = "0.00",
+			FastestRg = 500,
+			HighestHit = "0.00",
+			HighestFr = "0.00"
+		},
+		Spec2 = {
+			HighestAp = 0,
+			HighestCrit = "0.00",
+			FastestRg = 500,
+			HighestHit = "0.00",
+			HighestFr = "0.00"
+		},
 		Style = {
 			Ap = true,
 			Crit = true,
@@ -226,6 +237,12 @@ function TinyHunterStats:LibSharedMedia_Registered()
 	end
 end
 
+local orgSetActiveTalentGroup = _G.SetActiveTalentGroup;
+function SetActiveTalentGroup(...)	
+	SpecChangedPause = GetTime() + 60
+	return orgSetActiveTalentGroup(...)
+end
+
 function TinyHunterStats:OnEvent(event, arg1)
 	if ((event == "PLAYER_REGEN_ENABLED") or (event == "PLAYER_ENTERING_WORLD")) then
 		self.thsframe:SetAlpha(self.db.char.outOfCombatAlpha)
@@ -241,6 +258,24 @@ function TinyHunterStats:OnEvent(event, arg1)
 	end
 end
 
+local function OldDB()
+	if not TinyCasterStats.db.char.DBver or TinyCasterStats.db.char.DBver < 2 then
+		if SpecChangedPause <= GetTime() then
+			SpecChangedPause = GetTime() + 60
+			DEFAULT_CHAT_FRAME:AddMessage("|cffffd700"..AddonName..": Please /Reload UI (DB reset)|r")
+		end	
+		return true
+	end
+end
+
+local function HexColor(stat)
+
+	local c = TinyHunterStats.db.char.Color[stat]
+	local hexColor = string.format("|cff%2X%2X%2X", 255*c.r, 255*c.g, 255*c.b)
+	return hexColor
+	
+end
+
 local function GetHit()
 	
 	local CombatRating = GetCombatRatingBonus(CR_HIT_RANGED) or 0;
@@ -250,6 +285,7 @@ local function GetHit()
 end
 
 function TinyHunterStats:Stats()
+	if OldDB() then return end
 	local style = self.db.char.Style
 	local base, buff, debuff = UnitRangedAttackPower("player")
 	local pow = base + buff + debuff
@@ -257,43 +293,46 @@ function TinyHunterStats:Stats()
 	local speed = string.format("%.2f", UnitRangedDamage("player"))
 	local hit = GetHit()
 	local fr = string.format("%.2f", GetPowerRegen() or 0)
+	local spec = "Spec"..GetActiveTalentGroup()
 	
 	local recordbrocken = "|cffFF0000"..L["Record broken!"]..": "
 	local recordIsBroken = false
 	
-	if (tonumber(pow) > tonumber(self.db.char.HighestAp)) then
-		self.db.char.HighestAp = pow
-		if (self.db.char.RecordMsg == true) then
-			DEFAULT_CHAT_FRAME:AddMessage(recordbrocken..STAT_ATTACK_POWER..": |c00ffef00"..self.db.char.HighestAp.."|r")
-			recordIsBroken = true
+	if SpecChangedPause <= GetTime() then
+		if (tonumber(pow) > tonumber(self.db.char[spec].HighestAp)) then
+			self.db.char[spec].HighestAp = pow
+			if (self.db.char.RecordMsg == true) then
+				DEFAULT_CHAT_FRAME:AddMessage(recordbrocken..STAT_ATTACK_POWER..": |c00ffef00"..self.db.char[spec].HighestAp.."|r")
+				recordIsBroken = true
+			end
 		end
-	end
-	if (tonumber(crit) > tonumber(self.db.char.HighestCrit)) then
-		self.db.char.HighestCrit = crit
-		if (self.db.char.RecordMsg == true) then
-			DEFAULT_CHAT_FRAME:AddMessage(recordbrocken..RANGED_CRIT_CHANCE..": |c00ffef00"..self.db.char.HighestCrit.."|r")
-			recordIsBroken = true
+		if (tonumber(crit) > tonumber(self.db.char[spec].HighestCrit)) then
+			self.db.char[spec].HighestCrit = crit
+			if (self.db.char.RecordMsg == true) then
+				DEFAULT_CHAT_FRAME:AddMessage(recordbrocken..RANGED_CRIT_CHANCE..": |c00ffef00"..self.db.char[spec].HighestCrit.."|r")
+				recordIsBroken = true
+			end
 		end
-	end
-	if (tonumber(speed) < tonumber(self.db.char.FastestRg)) then
-		self.db.char.FastestRg = speed
-		if (self.db.char.RecordMsg == true) then
-			DEFAULT_CHAT_FRAME:AddMessage(recordbrocken..STAT_ATTACK_SPEED..": |c00ffef00"..self.db.char.FastestRg.."|r")
-			recordIsBroken = true
+		if (tonumber(speed) < tonumber(self.db.char[spec].FastestRg)) then
+			self.db.char[spec].FastestRg = speed
+			if (self.db.char.RecordMsg == true) then
+				DEFAULT_CHAT_FRAME:AddMessage(recordbrocken..STAT_ATTACK_SPEED..": |c00ffef00"..self.db.char[spec].FastestRg.."|r")
+				recordIsBroken = true
+			end
 		end
-	end
-	if (tonumber(hit) > tonumber(self.db.char.HighestHit)) then
-		self.db.char.HighestHit = hit
-		if (self.db.char.RecordMsg == true) then
-			DEFAULT_CHAT_FRAME:AddMessage(recordbrocken..STAT_HIT_CHANCE..": |c00ffef00"..self.db.char.HighestHit.."|r")
-			recordIsBroken = true
+		if (tonumber(hit) > tonumber(self.db.char[spec].HighestHit)) then
+			self.db.char[spec].HighestHit = hit
+			if (self.db.char.RecordMsg == true) then
+				DEFAULT_CHAT_FRAME:AddMessage(recordbrocken..STAT_HIT_CHANCE..": |c00ffef00"..self.db.char[spec].HighestHit.."|r")
+				recordIsBroken = true
+			end
 		end
-	end
-	if (tonumber(fr) > tonumber(self.db.char.HighestFr)) then
-		self.db.char.HighestFr = fr
-		if (self.db.char.RecordMsg == true) then
-			DEFAULT_CHAT_FRAME:AddMessage(recordbrocken..STAT_FOCUS_REGEN..": |c00ffef00"..self.db.char.HighestFr.."|r")
-			recordIsBroken = true
+		if (tonumber(fr) > tonumber(self.db.char[spec].HighestFr)) then
+			self.db.char[spec].HighestFr = fr
+			if (self.db.char.RecordMsg == true) then
+				DEFAULT_CHAT_FRAME:AddMessage(recordbrocken..STAT_FOCUS_REGEN..": |c00ffef00"..self.db.char[spec].HighestFr.."|r")
+				recordIsBroken = true
+			end
 		end
 	end
 	
@@ -309,7 +348,7 @@ function TinyHunterStats:Stats()
 	if (style.Ap == true) then
 		local apTempString = ""
 		local apRecordTempString = ""
-		ldbString = ldbString.."|c00ffef00"
+		ldbString = ldbString..HexColor("ap")
 		if (style.labels) then
 			apTempString = apTempString..L["Ap:"].." "
 			ldbString = ldbString..L["Ap:"].." "
@@ -317,20 +356,20 @@ function TinyHunterStats:Stats()
 		apTempString = apTempString..pow
 		ldbString = ldbString..pow.." "
 		if (style.showRecords) then
-			ldbRecord = ldbRecord.."|c00ffef00"
+			ldbRecord = ldbRecord..HexColor("ap")
 			if (style.vertical) then
 				apRecordTempString = apRecordTempString.."("..self.db.char.HighestAp..")"
 				if (style.labels) then
 					ldbRecord = ldbRecord..L["Ap:"].." "
 				end
-				ldbRecord = ldbRecord..self.db.char.HighestAp.." "
+				ldbRecord = ldbRecord..self.db.char[spec].HighestAp.." "
 			else
 				if (style.labels) then
 					apRecordTempString = apRecordTempString..L["Ap:"].." "
 					ldbRecord = ldbRecord..L["Ap:"].." "
 				end
-				apRecordTempString = apRecordTempString..self.db.char.HighestAp
-				ldbRecord = ldbRecord..self.db.char.HighestAp.." "
+				apRecordTempString = apRecordTempString..self.db.char[spec].HighestAp
+				ldbRecord = ldbRecord..self.db.char[spec].HighestAp.." "
 			end
 		end
 		self.strings.apString:SetText(apTempString)
@@ -342,7 +381,7 @@ function TinyHunterStats:Stats()
 	if (style.Crit == true) then
 		local critTempString = ""
 		local critRecordTempString = ""
-		ldbString = ldbString.."|c00ff00ff"
+		ldbString = ldbString..HexColor("crit")
 		if (style.labels) then
 			critTempString = critTempString..L["Crit:"].." "
 			ldbString = ldbString..L["Crit:"].." "
@@ -350,20 +389,20 @@ function TinyHunterStats:Stats()
 		critTempString = critTempString..crit.."%"
 		ldbString = ldbString..crit.."% "
 		if (style.showRecords) then
-			ldbRecord = ldbRecord.."|c00ff00ff"
+			ldbRecord = ldbRecord..HexColor("crit")
 			if (style.vertical) then
 				if (style.labels) then
 					ldbRecord = ldbRecord..L["Crit:"].." "
 				end
-				critRecordTempString = critRecordTempString.."("..self.db.char.HighestCrit.."%)"
-				ldbRecord = ldbRecord..self.db.char.HighestCrit.."% "
+				critRecordTempString = critRecordTempString.."("..self.db.char[spec].HighestCrit.."%)"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestCrit.."% "
 			else
 				if (style.labels) then
 					critRecordTempString = critRecordTempString..L["Crit:"].." "
 					ldbRecord = ldbRecord..L["Crit:"].." "
 				end
-				critRecordTempString = critRecordTempString..self.db.char.HighestCrit.."%"
-				ldbRecord = ldbRecord..self.db.char.HighestCrit.."% "
+				critRecordTempString = critRecordTempString..self.db.char[spec].HighestCrit.."%"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestCrit.."% "
 			end
 		end
 		self.strings.critString:SetText(critTempString)
@@ -375,7 +414,7 @@ function TinyHunterStats:Stats()
 	if (style.Speed == true) then
 		local speedTempString = ""
 		local speedRecordTempString = ""
-		ldbString = ldbString.."|c0000CD00"
+		ldbString = ldbString..HexColor("speed")
 		if (style.labels) then
 			speedTempString = speedTempString..L["Speed:"].." "
 			ldbString = ldbString..L["Speed:"].." "
@@ -383,20 +422,20 @@ function TinyHunterStats:Stats()
 		speedTempString = speedTempString..speed.."s"
 		ldbString = ldbString..speed.."s "
 		if (style.showRecords) then
-			ldbRecord = ldbRecord.."|c0000CD00"
+			ldbRecord = ldbRecord..HexColor("speed")
 			if (style.vertical) then
 				if (style.labels) then
 					ldbRecord = ldbRecord..L["Speed:"].." "
 				end
-				speedRecordTempString = speedRecordTempString.."("..self.db.char.FastestRg.."s)"
-				ldbRecord = ldbRecord..self.db.char.FastestRg.."s "
+				speedRecordTempString = speedRecordTempString.."("..self.db.char[spec].FastestRg.."s)"
+				ldbRecord = ldbRecord..self.db.char[spec].FastestRg.."s "
 			else
 				if (style.labels) then
 					speedRecordTempString = speedRecordTempString..L["Speed:"].." "
 					ldbRecord = ldbRecord..L["Speed:"].." "
 				end
-				speedRecordTempString = speedRecordTempString..self.db.char.FastestRg.."s"
-				ldbRecord = ldbRecord..self.db.char.FastestRg.."s "
+				speedRecordTempString = speedRecordTempString..self.db.char[spec].FastestRg.."s"
+				ldbRecord = ldbRecord..self.db.char[spec].FastestRg.."s "
 			end
 		end
 		self.strings.speedString:SetText(speedTempString)
@@ -408,7 +447,7 @@ function TinyHunterStats:Stats()
 	if (style.Hit == true) then
 		local hitTempString = ""
 		local hitRecordTempString = ""
-		ldbString = ldbString.."|c001E90FF"
+		ldbString = ldbString..HexColor("hit")
 		if (style.labels) then
 			hitTempString = hitTempString..L["Hit:"].." "
 			ldbString = ldbString..L["Hit:"].." "
@@ -416,20 +455,20 @@ function TinyHunterStats:Stats()
 		hitTempString = hitTempString..hit.."%"
 		ldbString = ldbString..hit.."% "
 		if (style.showRecords) then
-			ldbRecord = ldbRecord.."|c001E90FF"
+			ldbRecord = ldbRecord..HexColor("hit")
 			if (style.vertical) then
 				if (style.labels) then
 					ldbRecord = ldbRecord..L["Hit:"].." "
 				end
-				hitRecordTempString = hitRecordTempString.."("..self.db.char.HighestHit.."%)"
-				ldbRecord = ldbRecord..self.db.char.HighestHit.."% "
+				hitRecordTempString = hitRecordTempString.."("..self.db.char[spec].HighestHit.."%)"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestHit.."% "
 			else
 				if (style.labels) then
 					hitRecordTempString = hitRecordTempString..L["Hit:"].." "
 					ldbRecord = ldbRecord..L["Hit:"].." "
 				end
-				hitRecordTempString = hitRecordTempString..self.db.char.HighestHit.."%"
-				ldbRecord = ldbRecord..self.db.char.HighestHit.."% "
+				hitRecordTempString = hitRecordTempString..self.db.char[spec].HighestHit.."%"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestHit.."% "
 			end
 		end
 		self.strings.hitString:SetText(hitTempString)
@@ -441,7 +480,7 @@ function TinyHunterStats:Stats()
 	if (style.Fr == true) then
 		local frTempString = ""
 		local frRecordTempString = ""
-		ldbString = ldbString.."|c001E90FF"
+		ldbString = ldbString..HexColor("fr")
 		if (style.labels) then
 			frTempString = frTempString..L["Fr:"].." "
 			ldbString = ldbString..L["Fr:"].." "
@@ -449,20 +488,20 @@ function TinyHunterStats:Stats()
 		frTempString = frTempString..fr
 		ldbString = ldbString..fr.." "
 		if (style.showRecords) then
-			ldbRecord = ldbRecord.."|c001E90FF"
+			ldbRecord = ldbRecord..HexColor("fr")
 			if (style.vertical) then
 				if (style.labels) then
 					ldbRecord = ldbRecord..L["Fr:"].." "
 				end
-				frRecordTempString = frRecordTempString.."("..self.db.char.HighestFr..")"
-				ldbRecord = ldbRecord..self.db.char.HighestFr.." "
+				frRecordTempString = frRecordTempString.."("..self.db.char[spec].HighestFr..")"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestFr.." "
 			else
 				if (style.labels) then
 					frRecordTempString = frRecordTempString..L["Fr:"].." "
 					ldbRecord = ldbRecord..L["Fr:"].." "
 				end
-				frRecordTempString = frRecordTempString..self.db.char.HighestFr
-				ldbRecord = ldbRecord..self.db.char.HighestFr.." "
+				frRecordTempString = frRecordTempString..self.db.char[spec].HighestFr
+				ldbRecord = ldbRecord..self.db.char[spec].HighestFr.." "
 			end
 		end
 		self.strings.frString:SetText(frTempString)
