@@ -90,6 +90,7 @@ function TinyHunterStats:Options()
 							local c = self.db.char.Color.ap
 							c.r, c.g, c.b = r, g, b
 							self:SetStringColors()
+							self:Stats()
 						end,
 						order = 4,
 					},
@@ -123,6 +124,7 @@ function TinyHunterStats:Options()
 							local c = self.db.char.Color.crit
 							c.r, c.g, c.b = r, g, b
 							self:SetStringColors()
+							self:Stats()
 						end,
 						order = 6,
 					},
@@ -156,6 +158,7 @@ function TinyHunterStats:Options()
 							local c = self.db.char.Color.speed
 							c.r, c.g, c.b = r, g, b
 							self:SetStringColors()
+							self:Stats()
 						end,
 						order = 8,
 					},
@@ -189,6 +192,7 @@ function TinyHunterStats:Options()
 							local c = self.db.char.Color.hit
 							c.r, c.g, c.b = r, g, b
 							self:SetStringColors()
+							self:Stats()
 						end,
 						order = 10,
 					},
@@ -222,6 +226,7 @@ function TinyHunterStats:Options()
 							local c = self.db.char.Color.fr
 							c.r, c.g, c.b = r, g, b
 							self:SetStringColors()
+							self:Stats()
 						end,
 						order = 12,
 					},
@@ -253,9 +258,10 @@ function TinyHunterStats:Options()
 						width = 'normal',
 						type = 'execute',
 						func = function()
-							for stat, num in pairs(TinyHunterStats.defaults.char) do
+							local spec = "Spec"..GetActiveTalentGroup()
+							for stat, num in pairs(self.defaults.char[spec]) do
 								if string.find(stat,"Highest") or string.find(stat,"Fastest") then
-									self.db.char[stat] = num
+									self.db.char[spec][stat] = num
 								end
 							end
 							self:Stats()
@@ -268,12 +274,13 @@ function TinyHunterStats:Options()
 						desc = L["Clears your current color settings"],
 						type = 'execute',
 						func = function()
-							for stat, c in pairs(TinyHunterStats.defaults.char.Color) do
+							for stat, c in pairs(self.defaults.char.Color) do
 								self.db.char.Color[stat].r = c.r 
 								self.db.char.Color[stat].g = c.g
 								self.db.char.Color[stat].b = c.b 								
 							end
 							self:SetStringColors()
+							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
 						order = 23,
@@ -286,7 +293,7 @@ function TinyHunterStats:Options()
 				type = 'group',
 				order = 3,
 				args = {			
-				oocalpha = {
+					oocalpha = {
 						name = L["Text Alpha"].." "..L["out of combat"],
 						desc = L["Alpha of the text"].." ("..L["out of combat"]..")",
 						width = 'full',
