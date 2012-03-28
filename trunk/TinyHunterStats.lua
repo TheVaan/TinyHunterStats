@@ -277,6 +277,23 @@ local function HexColor(stat)
 	
 end
 
+local function GetSpeed()
+	-- If no ranged attack then set to n/a
+	local hasRelic = UnitHasRelicSlot("player");	
+	local rangedTexture = GetInventoryItemTexture("player", 18);
+	if ( rangedTexture and not hasRelic ) then
+		local speed = UnitRangedDamage("player")
+		if speed >= 0.01 then
+			return string.format("%.2f",speed )
+		else
+			return 500
+		end
+	else
+		return NOT_APPLICABLE
+	end
+	
+end
+
 local function GetHit()
 	
 	local CombatRating = GetCombatRatingBonus(CR_HIT_RANGED) or 0;
@@ -291,7 +308,7 @@ function TinyHunterStats:Stats()
 	local base, buff, debuff = UnitRangedAttackPower("player")
 	local pow = base + buff + debuff
 	local crit = string.format("%.2f", GetRangedCritChance("player"))
-	local speed = string.format("%.2f", UnitRangedDamage("player"))
+	local speed = GetSpeed()
 	local hit = GetHit()
 	local fr = string.format("%.2f", GetPowerRegen() or 0)
 	local spec = "Spec"..GetActiveTalentGroup()
@@ -314,7 +331,7 @@ function TinyHunterStats:Stats()
 				recordIsBroken = true
 			end
 		end
-		if (tonumber(speed) < tonumber(self.db.char[spec].FastestRg)) then
+		if (tonumber(speed) and (tonumber(speed) < tonumber(self.db.char[spec].FastestRg))) then
 			self.db.char[spec].FastestRg = speed
 			if (self.db.char.RecordMsg == true) then
 				DEFAULT_CHAT_FRAME:AddMessage(recordbrocken..STAT_ATTACK_SPEED..": |c00ffef00"..self.db.char[spec].FastestRg.."|r")

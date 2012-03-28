@@ -24,7 +24,7 @@ function TinyHunterStats:Options()
 				name = L["Reset position"],
 				desc = L["Resets the frame's position"],
 				type = 'execute',
-				func = function() thsframe:ClearAllPoints() thsframe:SetPoint("CENTER", UIParent, "CENTER") end,
+				func = function() self.thsframe:ClearAllPoints() self.thsframe:SetPoint("CENTER", UIParent, "CENTER") end,
 				disabled = function() return InCombatLockdown() end,
 				order = 1,
 			},
