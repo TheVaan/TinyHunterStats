@@ -169,10 +169,30 @@ function TinyHunterStats:SetDragScript()
 	end
 end
 
+function TinyHunterStats:SetFrameVisible()
+
+	if self.db.char.FrameHide then
+		self.thsframe:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", -1000, -1000)
+	else
+		self.thsframe:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", self.db.char.xPosition, self.db.char.yPosition)
+	end
+	
+end
+
+function TinyHunterStats:SetBroker()
+
+	if self.db.char.Style.LDBtext then
+		THSBroker.label = ""
+	else
+		THSBroker.label = AddonName
+	end
+		
+end
+
 function TinyHunterStats:InitializeFrame()
 	self.thsframe:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", self.db.char.xPosition, self.db.char.yPosition)
 	local font = media:Fetch("font", self.db.char.Font)
-		for k, fontObject in pairs(self.strings) do
+	for k, fontObject in pairs(self.strings) do
 		fontObject:SetFontObject(GameFontNormal)
 		if not fontObject:SetFont(font, self.db.char.Size, self.db.char.FontEffect) then
 			fontObject:SetFont("Fonts\\FRIZQT__.TTF", self.db.char.Size, self.db.char.FontEffect)
@@ -186,6 +206,8 @@ function TinyHunterStats:InitializeFrame()
 	self:SetTextAnchors()
 	self:SetStringColors()
 	self:SetDragScript()
+	self:SetFrameVisible()
+	self:SetBroker()
 	self:Stats()
 end
 

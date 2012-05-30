@@ -307,7 +307,7 @@ function TinyHunterStats:Options()
 							self.db.char.outOfCombatAlpha = newValue
 							self.thsframe:SetAlpha(self.db.char.outOfCombatAlpha)
 						end,
-						disabled = function() return InCombatLockdown() end,
+						disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
 						order = 1,
 					},
 					icalpha = {
@@ -324,7 +324,7 @@ function TinyHunterStats:Options()
 							self.db.char.inCombatAlpha = newValue
 							self.thsframe:SetAlpha(self.db.char.inCombatAlpha)
 						end,
-						disabled = function() return InCombatLockdown() end,
+						disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
 						order = 2,
 					},
 					barfontsize = {
@@ -341,7 +341,9 @@ function TinyHunterStats:Options()
 							for k, fontObject in pairs(self.strings) do
 								fontObject:SetFont(font, self.db.char.Size, self.db.char.FontEffect)
 							end
+							self:InitializeFrame()
 						end,
+						disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
 						order = 3,
 					},
 					font = {
@@ -356,6 +358,7 @@ function TinyHunterStats:Options()
 							end
 						end,
 						values = self.fonts,
+						disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
 						order = 4,
 					},
 					fonteffect = {
@@ -370,6 +373,7 @@ function TinyHunterStats:Options()
 							end
 						end,
 						values = self.fonteffects,
+						disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
 						order = 5,
 					},
 					vertical = {
@@ -387,12 +391,13 @@ function TinyHunterStats:Options()
 							self:Stats()
 							self:SetTextAnchors()
 						end,
-						disabled = function() return InCombatLockdown() end,
+						disabled = function() return InCombatLockdown() or self.db.char.FrameHide end,
 						order = 6,
 					},
 					labels = {
 						name = L["Show labels"],
 						desc = L["Whether or not to show labels for each stat"],
+						width = 'full',
 						type = 'toggle',
 						get = function() return self.db.char.Style.labels end,
 						set = function(info, value)
@@ -409,7 +414,7 @@ function TinyHunterStats:Options()
 					LDBtext = {
 						name = L["Broker Text"],
 						desc = L["Displays stats in the LDB text field."],
-						width = 'full',
+						--width = 'full',
 						type = 'toggle',
 						get = function() return self.db.char.Style.LDBtext end,
 						set = function(info, value)
@@ -423,10 +428,26 @@ function TinyHunterStats:Options()
 						disabled = function() return InCombatLockdown() end,
 						order = 8
 					},
+					hide = {
+						name = L["Hide Frame"],
+						desc = L["Hide the text frame (to show stats only in the LDB text field)"],
+						type = 'toggle',
+						get = function() return self.db.char.FrameHide end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.FrameHide = true
+							else
+								self.db.char.FrameHide = false
+							end
+							self:SetFrameVisible()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 9
+					},
 					spaceline4 = {
 						name = " ",
 						type = 'description',
-						order = 9,
+						order = 20,
 					},
 					record = {
 						name = L["Announce records"],
@@ -441,7 +462,7 @@ function TinyHunterStats:Options()
 							end
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 10,
+						order = 21,
 					},
 					recordSound = {
 						name = L["Play sound on record"],
@@ -456,12 +477,12 @@ function TinyHunterStats:Options()
 							end
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 11,
+						order = 22,
 					},
 					spaceline5 = {
 						name = " ",
 						type = 'description',
-						order = 12,
+						order = 30,
 					},
 					selectSound = {
 						name = SOUND_LABEL,
@@ -471,7 +492,7 @@ function TinyHunterStats:Options()
 						set = function(info, value) self.db.char.RecordSoundFile = value end,
 						values = AceGUIWidgetLSMlists.sound,
 						disabled = function() return InCombatLockdown() end,
-						order = 13,
+						order = 31,
 					},
 				}
 			},
