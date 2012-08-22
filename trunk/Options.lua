@@ -7,6 +7,7 @@ if not TinyHunterStats then return end
 local AddonName = "TinyHunterStats"
 local L = LibStub("AceLocale-3.0"):GetLocale(AddonName)
 local media = LibStub:GetLibrary("LibSharedMedia-3.0")
+local currentBuild = select(4, GetBuildInfo())
 
 TinyHunterStats.fonteffects = {
 	["none"] = L["NONE"],
@@ -24,7 +25,14 @@ function TinyHunterStats:Options()
 				name = L["Reset position"],
 				desc = L["Resets the frame's position"],
 				type = 'execute',
-				func = function() self.thsframe:ClearAllPoints() self.thsframe:SetPoint("CENTER", UIParent, "CENTER") end,
+				func = function()
+						if IsShiftKeyDown() then
+							self.db.profile.debug = not self.db.profile.debug
+							print(AddonName,"- Debug:",self.db.profile.debug)
+						else
+							self.thsframe:ClearAllPoints() self.thsframe:SetPoint("CENTER", UIParent, "CENTER")
+						end
+					end,
 				disabled = function() return InCombatLockdown() end,
 				order = 1,
 			},
@@ -258,7 +266,12 @@ function TinyHunterStats:Options()
 						width = 'normal',
 						type = 'execute',
 						func = function()
-							local spec = "Spec"..GetActiveTalentGroup()
+							local spec = "Spec"
+							if currentBuild  >= 50000 then
+								spec = spec..GetActiveSpecGroup()
+							else
+								spec = spec..GetActiveTalentGroup()
+							end
 							for stat, num in pairs(self.defaults.char[spec]) do
 								if string.find(stat,"Highest") or string.find(stat,"Fastest") then
 									self.db.char[spec][stat] = num

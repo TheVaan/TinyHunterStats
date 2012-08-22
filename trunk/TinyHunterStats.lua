@@ -20,6 +20,21 @@ local THSBroker = ldb:NewDataObject(AddonName, {
 	})
 
 local SpecChangedPause = GetTime()
+local currentBuild = select(4, GetBuildInfo())
+
+local function Debug(...)
+	if TinyHunterStats.db.profile.debug then
+		local text = ""
+		for i = 1, select("#", ...) do
+			if type(select(i, ...)) == "boolean" then
+				text = text..(select(i, ...) and "true" or "false").." "
+			else
+				text = text..(select(i, ...) or "nil").." "
+			end
+		end
+		DEFAULT_CHAT_FRAME:AddMessage("|cFFCCCC99"..AddonName..": |r"..text)
+	end
+end
 
 TinyHunterStats.fonts = {}
 
@@ -260,10 +275,21 @@ function TinyHunterStats:LibSharedMedia_Registered()
 	end
 end
 
-local orgSetActiveTalentGroup = _G.SetActiveTalentGroup;
+local orgSetActiveSpecGroup
+if currentBuild  > 50000 then
+	orgSetActiveSpecGroup = SetActiveSpecGroup;
+else
+	orgSetActiveSpecGroup = _G.SetActiveTalentGroup;
+end
+function SetActiveSpecGroup(...)	
+	SpecChangedPause = GetTime() + 60
+	Debug("Set SpecChangedPause")
+	return orgSetActiveSpecGroup(...)
+end
 function SetActiveTalentGroup(...)	
 	SpecChangedPause = GetTime() + 60
-	return orgSetActiveTalentGroup(...)
+	Debug("Set SpecChangedPause")
+	return orgSetActiveSpecGroup(...)
 end
 
 function TinyHunterStats:OnEvent(event, arg1)
@@ -278,16 +304,6 @@ function TinyHunterStats:OnEvent(event, arg1)
 	end
 	if (event ~= "UNIT_AURA") then
 		self:Stats()
-	end
-end
-
-local function OldDB()
-	if not TinyHunterStats.db.char.DBver or TinyHunterStats.db.char.DBver < 2 then
-		if SpecChangedPause <= GetTime() then
-			SpecChangedPause = GetTime() + 60
-			DEFAULT_CHAT_FRAME:AddMessage("|cffffd700"..AddonName..": Please /Reload UI (DB reset)|r")
-		end	
-		return true
 	end
 end
 
@@ -325,7 +341,7 @@ local function GetHit()
 end
 
 function TinyHunterStats:Stats()
-	if OldDB() then return end
+	Debug("Stats()")
 	local style = self.db.char.Style
 	local base, buff, debuff = UnitRangedAttackPower("player")
 	local pow = base + buff + debuff
@@ -333,7 +349,12 @@ function TinyHunterStats:Stats()
 	local speed = GetSpeed()
 	local hit = GetHit()
 	local fr = string.format("%.2f", GetPowerRegen() or 0)
-	local spec = "Spec"..GetActiveTalentGroup()
+	local spec = "Spec"
+	if currentBuild >= 50000 then
+		spec = spec..GetActiveSpecGroup()
+	else
+		spec = spec..GetActiveTalentGroup()
+	end
 	
 	local recordbrocken = "|cffFF0000"..L["Record broken!"]..": "
 	local recordIsBroken = false
