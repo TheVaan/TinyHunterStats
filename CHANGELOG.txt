@@ -1,4 +1,12 @@
-=== r25 ==
+=== r29 ===
+
+* toc 50001
+* del old codes from 4.3.4
+* fix Bug "index field "profile" (a nil value)"
+* fix RangedSpeed
+* sorted Stats to match the CharacterStatsPane
+
+=== r25 ===
 
 * Options fix GetActiveTalentGroup()
 * LUA fix GetActiveTalentGroup()

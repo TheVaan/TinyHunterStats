@@ -20,10 +20,17 @@ local THSBroker = ldb:NewDataObject(AddonName, {
 	})
 
 local SpecChangedPause = GetTime()
-local currentBuild = select(4, GetBuildInfo())
+local weekday, month, day, year = CalendarGetDate()
+
+local backdrop = {
+	bgFile = "Interface\\Tooltips\\UI-Tooltip-Background",
+	edgeFile = "",
+	tile = false, tileSize = 16, edgeSize = 0,
+	insets = { left = 0, right = 0, top = 0, bottom = 0 }
+}
 
 local function Debug(...)
-	if TinyHunterStats.db.profile.debug then
+	if TinyHunterStats.db.profile and TinyHunterStats.db.profile.debug then
 		local text = ""
 		for i = 1, select("#", ...) do
 			if type(select(i, ...)) == "boolean" then
@@ -147,28 +154,28 @@ function TinyHunterStats:SetTextAnchors()
 	local offsetX, offsetY = 3, 0
 	if (not self.db.char.Style.vertical) then
 		self.strings.apString:SetPoint("TOPLEFT", self.thsframe,"TOPLEFT", offsetX, offsetY)
-		self.strings.critString:SetPoint("TOPLEFT", self.strings.apString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.speedString:SetPoint("TOPLEFT", self.strings.critString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.hitString:SetPoint("TOPLEFT", self.strings.speedString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.frString:SetPoint("TOPLEFT", self.strings.hitString, "TOPRIGHT", offsetX, offsetY)
-		
+		self.strings.speedString:SetPoint("TOPLEFT", self.strings.apString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.frString:SetPoint("TOPLEFT", self.strings.speedString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.hitString:SetPoint("TOPLEFT", self.strings.frString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.critString:SetPoint("TOPLEFT", self.strings.hitString, "TOPRIGHT", offsetX, offsetY)
+				
 		self.strings.apRecordString:SetPoint("TOPLEFT", self.strings.apString, "BOTTOMLEFT")
-		self.strings.critRecordString:SetPoint("TOPLEFT", self.strings.apRecordString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.speedRecordString:SetPoint("TOPLEFT", self.strings.critRecordString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.hitRecordString:SetPoint("TOPLEFT", self.strings.speedRecordString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.frRecordString:SetPoint("TOPLEFT", self.strings.hitRecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.speedRecordString:SetPoint("TOPLEFT", self.strings.apRecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.frRecordString:SetPoint("TOPLEFT", self.strings.speedRecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.hitRecordString:SetPoint("TOPLEFT", self.strings.frRecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.critRecordString:SetPoint("TOPLEFT", self.strings.hitRecordString, "TOPRIGHT", offsetX, offsetY)
 	else
 		self.strings.apString:SetPoint("TOPLEFT", self.thsframe,"TOPLEFT", offsetX, offsetY)
-		self.strings.critString:SetPoint("TOPLEFT", self.strings.apString, "BOTTOMLEFT")
-		self.strings.speedString:SetPoint("TOPLEFT", self.strings.critString, "BOTTOMLEFT")
-		self.strings.hitString:SetPoint("TOPLEFT", self.strings.speedString, "BOTTOMLEFT")
-		self.strings.frString:SetPoint("TOPLEFT", self.strings.hitString, "BOTTOMLEFT")
+		self.strings.speedString:SetPoint("TOPLEFT", self.strings.apString, "BOTTOMLEFT")
+		self.strings.frString:SetPoint("TOPLEFT", self.strings.speedString, "BOTTOMLEFT")
+		self.strings.hitString:SetPoint("TOPLEFT", self.strings.frString, "BOTTOMLEFT")
+		self.strings.critString:SetPoint("TOPLEFT", self.strings.hitString, "BOTTOMLEFT")
 		
 		self.strings.apRecordString:SetPoint("TOPLEFT", self.strings.apString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.critRecordString:SetPoint("TOPLEFT", self.strings.critString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.speedRecordString:SetPoint("TOPLEFT", self.strings.speedString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.hitRecordString:SetPoint("TOPLEFT", self.strings.hitString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.frRecordString:SetPoint("TOPLEFT", self.strings.frString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.hitRecordString:SetPoint("TOPLEFT", self.strings.hitString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.critRecordString:SetPoint("TOPLEFT", self.strings.critString, "TOPRIGHT", offsetX, offsetY)
 	end
 end
 
@@ -177,10 +184,14 @@ function TinyHunterStats:SetDragScript()
 		self.thsframe:SetMovable(false)
 		fixed = "|cffFF0000"..L["Text is fixed. Uncheck Lock Frame in the options to move!"].."|r"
 		self.thsframe:SetScript("OnDragStart", function() DEFAULT_CHAT_FRAME:AddMessage(fixed) end)
+		self.thsframe:SetScript("OnEnter", nil)
+		self.thsframe:SetScript("OnLeave", nil)
 	else
 		self.thsframe:SetMovable(true)
 		self.thsframe:SetScript("OnDragStart", function() self.thsframe:StartMoving() end)
 		self.thsframe:SetScript("OnDragStop", function() self.thsframe:StopMovingOrSizing() self.db.char.xPosition = self.thsframe:GetLeft() self.db.char.yPosition = self.thsframe:GetBottom()	end)
+		self.thsframe:SetScript("OnEnter", function() self.thsframe:SetBackdrop(backdrop) end)
+		self.thsframe:SetScript("OnLeave", function() self.thsframe:SetBackdrop(nil) end)
 	end
 end
 
@@ -244,6 +255,9 @@ function TinyHunterStats:OnInitialize()
 	
 	THSBroker.OnClick = function(frame, button)	AceConfigDialog:Open(AddonName)	end
 	THSBroker.OnTooltipShow = function(tt) tt:AddLine(AddonName) end
+	
+	TinyHStatsDB = TinyHStatsDB or {}
+	self.Globaldb = TinyHStatsDB
 end
 
 function TinyHunterStats:OnEnable()
@@ -275,18 +289,8 @@ function TinyHunterStats:LibSharedMedia_Registered()
 	end
 end
 
-local orgSetActiveSpecGroup
-if currentBuild  > 50000 then
-	orgSetActiveSpecGroup = SetActiveSpecGroup;
-else
-	orgSetActiveSpecGroup = _G.SetActiveTalentGroup;
-end
+local orgSetActiveSpecGroup = SetActiveSpecGroup;
 function SetActiveSpecGroup(...)	
-	SpecChangedPause = GetTime() + 60
-	Debug("Set SpecChangedPause")
-	return orgSetActiveSpecGroup(...)
-end
-function SetActiveTalentGroup(...)	
 	SpecChangedPause = GetTime() + 60
 	Debug("Set SpecChangedPause")
 	return orgSetActiveSpecGroup(...)
@@ -295,6 +299,10 @@ end
 function TinyHunterStats:OnEvent(event, arg1)
 	if ((event == "PLAYER_REGEN_ENABLED") or (event == "PLAYER_ENTERING_WORLD")) then
 		self.thsframe:SetAlpha(self.db.char.outOfCombatAlpha)
+		if self.db.char.PostXStatsDay ~= day then
+			self.db.char.PostXStatsDay = day
+			TinyHunterStats:UseTinyXStats()
+		end
 	end
 	if (event == "PLAYER_REGEN_DISABLED") then
 		self.thsframe:SetAlpha(self.db.char.inCombatAlpha)
@@ -307,6 +315,20 @@ function TinyHunterStats:OnEvent(event, arg1)
 	end
 end
 
+function TinyHunterStats:UseTinyXStats()
+
+	if self.Globaldb.NoXStatsPrint then return end
+	
+	local text = {}
+	text[1] = "|cFF00ff00You can use TinyXStats, (all in one Stats Addon).|r"
+	text[2] = "http://www.curse.com/addons/wow/tinystats"
+	text[3] = "|cFF00ff00This will always be updated as the first.|r"
+	for i = 1, 3 do
+		DEFAULT_CHAT_FRAME:AddMessage("|cFFCCCC99"..AddonName..": |r"..text[i])
+	end
+
+end
+
 local function HexColor(stat)
 
 	local c = TinyHunterStats.db.char.Color[stat]
@@ -317,9 +339,10 @@ end
 
 local function GetSpeed()
 	-- If no ranged attack then set to n/a
-	local hasRelic = UnitHasRelicSlot("player");	
-	local rangedTexture = GetInventoryItemTexture("player", 18);
-	if ( rangedTexture and not hasRelic ) then
+	--local hasRelic = UnitHasRelicSlot("player");	
+	--local rangedTexture = GetInventoryItemTexture("player", 18);
+	--if ( rangedTexture and not hasRelic ) then
+	if IsRangedWeapon() then	
 		local speed = UnitRangedDamage("player")
 		if speed >= 0.01 then
 			return string.format("%.2f",speed )
@@ -349,13 +372,7 @@ function TinyHunterStats:Stats()
 	local speed = GetSpeed()
 	local hit = GetHit()
 	local fr = string.format("%.2f", GetPowerRegen() or 0)
-	local spec = "Spec"
-	if currentBuild >= 50000 then
-		spec = spec..GetActiveSpecGroup()
-	else
-		spec = spec..GetActiveTalentGroup()
-	end
-	
+	local spec = "Spec"..GetActiveSpecGroup()
 	local recordbrocken = "|cffFF0000"..L["Record broken!"]..": "
 	local recordIsBroken = false
 	
@@ -419,7 +436,7 @@ function TinyHunterStats:Stats()
 		if (style.showRecords) then
 			ldbRecord = ldbRecord..HexColor("ap")
 			if (style.vertical) then
-				apRecordTempString = apRecordTempString.."("..self.db.char.HighestAp..")"
+				apRecordTempString = apRecordTempString.."("..self.db.char[spec].HighestAp..")"
 				if (style.labels) then
 					ldbRecord = ldbRecord..L["Ap:"].." "
 				end
@@ -438,39 +455,6 @@ function TinyHunterStats:Stats()
 	else
 		self.strings.apString:SetText("")
 		self.strings.apRecordString:SetText("")
-	end
-	if (style.Crit == true) then
-		local critTempString = ""
-		local critRecordTempString = ""
-		ldbString = ldbString..HexColor("crit")
-		if (style.labels) then
-			critTempString = critTempString..L["Crit:"].." "
-			ldbString = ldbString..L["Crit:"].." "
-		end
-		critTempString = critTempString..crit.."%"
-		ldbString = ldbString..crit.."% "
-		if (style.showRecords) then
-			ldbRecord = ldbRecord..HexColor("crit")
-			if (style.vertical) then
-				if (style.labels) then
-					ldbRecord = ldbRecord..L["Crit:"].." "
-				end
-				critRecordTempString = critRecordTempString.."("..self.db.char[spec].HighestCrit.."%)"
-				ldbRecord = ldbRecord..self.db.char[spec].HighestCrit.."% "
-			else
-				if (style.labels) then
-					critRecordTempString = critRecordTempString..L["Crit:"].." "
-					ldbRecord = ldbRecord..L["Crit:"].." "
-				end
-				critRecordTempString = critRecordTempString..self.db.char[spec].HighestCrit.."%"
-				ldbRecord = ldbRecord..self.db.char[spec].HighestCrit.."% "
-			end
-		end
-		self.strings.critString:SetText(critTempString)
-		self.strings.critRecordString:SetText(critRecordTempString)
-	else
-		self.strings.critString:SetText("")
-		self.strings.critRecordString:SetText("")
 	end
 	if (style.Speed == true) then
 		local speedTempString = ""
@@ -505,6 +489,39 @@ function TinyHunterStats:Stats()
 		self.strings.speedString:SetText("")
 		self.strings.speedRecordString:SetText("")
 	end
+	if (style.Fr == true) then
+		local frTempString = ""
+		local frRecordTempString = ""
+		ldbString = ldbString..HexColor("fr")
+		if (style.labels) then
+			frTempString = frTempString..L["Fr:"].." "
+			ldbString = ldbString..L["Fr:"].." "
+		end
+		frTempString = frTempString..fr
+		ldbString = ldbString..fr.." "
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("fr")
+			if (style.vertical) then
+				if (style.labels) then
+					ldbRecord = ldbRecord..L["Fr:"].." "
+				end
+				frRecordTempString = frRecordTempString.."("..self.db.char[spec].HighestFr..")"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestFr.." "
+			else
+				if (style.labels) then
+					frRecordTempString = frRecordTempString..L["Fr:"].." "
+					ldbRecord = ldbRecord..L["Fr:"].." "
+				end
+				frRecordTempString = frRecordTempString..self.db.char[spec].HighestFr
+				ldbRecord = ldbRecord..self.db.char[spec].HighestFr.." "
+			end
+		end
+		self.strings.frString:SetText(frTempString)
+		self.strings.frRecordString:SetText(frRecordTempString)
+	else
+		self.strings.frString:SetText("")
+		self.strings.frRecordString:SetText("")
+	end
 	if (style.Hit == true) then
 		local hitTempString = ""
 		local hitRecordTempString = ""
@@ -538,38 +555,38 @@ function TinyHunterStats:Stats()
 		self.strings.hitString:SetText("")
 		self.strings.hitRecordString:SetText("")
 	end
-	if (style.Fr == true) then
-		local frTempString = ""
-		local frRecordTempString = ""
-		ldbString = ldbString..HexColor("fr")
+	if (style.Crit == true) then
+		local critTempString = ""
+		local critRecordTempString = ""
+		ldbString = ldbString..HexColor("crit")
 		if (style.labels) then
-			frTempString = frTempString..L["Fr:"].." "
-			ldbString = ldbString..L["Fr:"].." "
+			critTempString = critTempString..L["Crit:"].." "
+			ldbString = ldbString..L["Crit:"].." "
 		end
-		frTempString = frTempString..fr
-		ldbString = ldbString..fr.." "
+		critTempString = critTempString..crit.."%"
+		ldbString = ldbString..crit.."% "
 		if (style.showRecords) then
-			ldbRecord = ldbRecord..HexColor("fr")
+			ldbRecord = ldbRecord..HexColor("crit")
 			if (style.vertical) then
 				if (style.labels) then
-					ldbRecord = ldbRecord..L["Fr:"].." "
+					ldbRecord = ldbRecord..L["Crit:"].." "
 				end
-				frRecordTempString = frRecordTempString.."("..self.db.char[spec].HighestFr..")"
-				ldbRecord = ldbRecord..self.db.char[spec].HighestFr.." "
+				critRecordTempString = critRecordTempString.."("..self.db.char[spec].HighestCrit.."%)"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestCrit.."% "
 			else
 				if (style.labels) then
-					frRecordTempString = frRecordTempString..L["Fr:"].." "
-					ldbRecord = ldbRecord..L["Fr:"].." "
+					critRecordTempString = critRecordTempString..L["Crit:"].." "
+					ldbRecord = ldbRecord..L["Crit:"].." "
 				end
-				frRecordTempString = frRecordTempString..self.db.char[spec].HighestFr
-				ldbRecord = ldbRecord..self.db.char[spec].HighestFr.." "
+				critRecordTempString = critRecordTempString..self.db.char[spec].HighestCrit.."%"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestCrit.."% "
 			end
 		end
-		self.strings.frString:SetText(frTempString)
-		self.strings.frRecordString:SetText(frRecordTempString)
+		self.strings.critString:SetText(critTempString)
+		self.strings.critRecordString:SetText(critRecordTempString)
 	else
-		self.strings.frString:SetText("")
-		self.strings.frRecordString:SetText("")
+		self.strings.critString:SetText("")
+		self.strings.critRecordString:SetText("")
 	end
 	
 	if (style.LDBtext) then
