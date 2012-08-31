@@ -7,7 +7,6 @@ if not TinyHunterStats then return end
 local AddonName = "TinyHunterStats"
 local L = LibStub("AceLocale-3.0"):GetLocale(AddonName)
 local media = LibStub:GetLibrary("LibSharedMedia-3.0")
-local currentBuild = select(4, GetBuildInfo())
 
 TinyHunterStats.fonteffects = {
 	["none"] = L["NONE"],
@@ -102,40 +101,6 @@ function TinyHunterStats:Options()
 						end,
 						order = 4,
 					},
-					crit = {
-						name = RANGED_CRIT_CHANCE,
-						desc = RANGED_CRIT_CHANCE.." "..SHOW.."/"..HIDE,
-						width = 'double',
-						type = 'toggle',
-						get = function() return self.db.char.Style.Crit end,
-						set = function(info, value)				
-							if(value) then
-								self.db.char.Style.Crit = true
-							else
-								self.db.char.Style.Crit = false
-							end
-							self:Stats()
-						end,
-						disabled = function() return InCombatLockdown() end,
-						order = 5,
-					},
-					critcolor = {
-						name = "",
-						desc = "",
-						width = 'half',
-						type = 'color',
-						get = function()
-							local c = self.db.char.Color.crit
-							return c.r, c.g, c.b
-						end,
-						set = function(info, r, g, b)
-							local c = self.db.char.Color.crit
-							c.r, c.g, c.b = r, g, b
-							self:SetStringColors()
-							self:Stats()
-						end,
-						order = 6,
-					},
 					speed = {
 						name = STAT_ATTACK_SPEED,
 						desc = STAT_ATTACK_SPEED.." "..SHOW.."/"..HIDE,
@@ -151,7 +116,7 @@ function TinyHunterStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 7,
+						order = 5,
 					},
 					speedcolor = {
 						name = "",
@@ -164,6 +129,40 @@ function TinyHunterStats:Options()
 						end,
 						set = function(info, r, g, b)
 							local c = self.db.char.Color.speed
+							c.r, c.g, c.b = r, g, b
+							self:SetStringColors()
+							self:Stats()
+						end,
+						order = 6,
+					},
+					fr = {
+						name = STAT_FOCUS_REGEN,
+						desc = STAT_FOCUS_REGEN.." "..SHOW.."/"..HIDE,
+						width = 'double',
+						type = 'toggle',
+						get = function() return self.db.char.Style.Fr end,
+						set = function(info, value)				
+							if(value) then
+								self.db.char.Style.Fr = true
+							else
+								self.db.char.Style.Fr = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 7,
+					},
+					frcolor = {
+						name = "",
+						desc = "",
+						width = 'half',
+						type = 'color',
+						get = function()
+							local c = self.db.char.Color.fr
+							return c.r, c.g, c.b
+						end,
+						set = function(info, r, g, b)
+							local c = self.db.char.Color.fr
 							c.r, c.g, c.b = r, g, b
 							self:SetStringColors()
 							self:Stats()
@@ -204,34 +203,34 @@ function TinyHunterStats:Options()
 						end,
 						order = 10,
 					},
-					fr = {
-						name = STAT_FOCUS_REGEN,
-						desc = STAT_FOCUS_REGEN.." "..SHOW.."/"..HIDE,
+					crit = {
+						name = RANGED_CRIT_CHANCE,
+						desc = RANGED_CRIT_CHANCE.." "..SHOW.."/"..HIDE,
 						width = 'double',
 						type = 'toggle',
-						get = function() return self.db.char.Style.Fr end,
+						get = function() return self.db.char.Style.Crit end,
 						set = function(info, value)				
 							if(value) then
-								self.db.char.Style.Fr = true
+								self.db.char.Style.Crit = true
 							else
-								self.db.char.Style.Fr = false
+								self.db.char.Style.Crit = false
 							end
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
 						order = 11,
 					},
-					frcolor = {
+					critcolor = {
 						name = "",
 						desc = "",
 						width = 'half',
 						type = 'color',
 						get = function()
-							local c = self.db.char.Color.fr
+							local c = self.db.char.Color.crit
 							return c.r, c.g, c.b
 						end,
 						set = function(info, r, g, b)
-							local c = self.db.char.Color.fr
+							local c = self.db.char.Color.crit
 							c.r, c.g, c.b = r, g, b
 							self:SetStringColors()
 							self:Stats()
@@ -266,12 +265,7 @@ function TinyHunterStats:Options()
 						width = 'normal',
 						type = 'execute',
 						func = function()
-							local spec = "Spec"
-							if currentBuild  >= 50000 then
-								spec = spec..GetActiveSpecGroup()
-							else
-								spec = spec..GetActiveTalentGroup()
-							end
+							local spec = "Spec"..GetActiveSpecGroup()
 							for stat, num in pairs(self.defaults.char[spec]) do
 								if string.find(stat,"Highest") or string.find(stat,"Fastest") then
 									self.db.char[spec][stat] = num
@@ -509,7 +503,57 @@ function TinyHunterStats:Options()
 					},
 				}
 			},
-			
+			XStats = {
+				name = "TinyXStats",
+				desc = "TinyXStats settings",
+				type = 'group',
+				order = 3,
+				args = {			
+					des1 = {
+						name = "|cFF00ff00You can use TinyXStats, (all in one Stats Addon).|r",
+						type = 'description',
+						order = 1,
+					},
+					spaceline1 = {
+						name = " ",
+						type = 'description',
+						order = 2,
+					},
+					des2 = {
+						name = "",
+						desc = "",
+						type = 'input',
+						width = "full",
+						get = function() return "http://www.curse.com/addons/wow/tinystats" end,
+						set = function(_,val) end,
+						order = 3,
+					},
+					spaceline2 = {
+						name = " ",
+						type = 'description',
+						order = 4,
+					},
+					des3 = {
+						name = "|cFF00ff00This will always be updated as the first.|r",
+						type = 'description',
+						order = 5,
+					},
+					spaceline3 = {
+						name = " ",
+						type = 'description',
+						order = 6,
+					},
+					XHide = {
+						name = "Hide Message",
+						desc = "Hide Message",
+						width = 'full',
+						type = 'toggle',
+						get = function() return self.Globaldb.NoXStatsPrint end,
+						set = function() self.Globaldb.NoXStatsPrint = not self.Globaldb.NoXStatsPrint end,
+						order = 7,
+					},
+				}
+			},
 		},
 	}
 	return options
