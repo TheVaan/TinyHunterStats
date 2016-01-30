@@ -1,20 +1,26 @@
+-- TinyHunterStats @project-version@ by @project-author@
+-- Project revision: @project-revision@
 --
--- File version: @file-revision@
--- Project: @project-revision@
---
+-- Options.lua:
+-- File revision: @file-revision@
+-- Last modified: @file-date-iso@
+-- Author: @file-author@
+
 if not TinyHunterStats then return end
 
 local AddonName = "TinyHunterStats"
 local L = LibStub("AceLocale-3.0"):GetLocale(AddonName)
-local media = LibStub:GetLibrary("LibSharedMedia-3.0")
+local media = LibStub("LibSharedMedia-3.0")
 
 TinyHunterStats.fonteffects = {
 	["none"] = L["NONE"],
 	["OUTLINE"] = L["OUTLINE"],
-	["THICKOUTLINE"] = L["THICKOUTLINE"],
+	["THICKOUTLINE"] = L["THICKOUTLINE"]
 }
 
 function TinyHunterStats:Options()
+	local show = string.lower(SHOW)
+	local hide = string.lower(HIDE)
 	local options = {
 		name = AddonName.." "..GetAddOnMetadata(AddonName,"Version"),
 	    handler = TinyHunterStats,
@@ -40,7 +46,7 @@ function TinyHunterStats:Options()
 				desc = L["Locks the position of the text frame"],
 				type = 'toggle',
 				get = function() return self.db.char.FrameLocked end,
-				set = function(info, value)				
+				set = function(info, value)
 					if(value) then
 						self.db.char.FrameLocked = true
 					else
@@ -69,11 +75,11 @@ function TinyHunterStats:Options()
 					},
 					ap = {
 						name = STAT_ATTACK_POWER,
-						desc = STAT_ATTACK_POWER.." "..SHOW.."/"..HIDE,
+						desc = STAT_ATTACK_POWER.." "..show.."/"..hide,
 						width = 'double',
 						type = 'toggle',
 						get = function() return self.db.char.Style.Ap end,
-						set = function(info, value)				
+						set = function(info, value)
 							if(value) then
 								self.db.char.Style.Ap = true
 							else
@@ -103,11 +109,11 @@ function TinyHunterStats:Options()
 					},
 					speed = {
 						name = STAT_ATTACK_SPEED,
-						desc = STAT_ATTACK_SPEED.." "..SHOW.."/"..HIDE,
+						desc = STAT_ATTACK_SPEED.." "..show.."/"..hide,
 						width = 'double',
 						type = 'toggle',
 						get = function() return self.db.char.Style.Speed end,
-						set = function(info, value)				
+						set = function(info, value)
 							if(value) then
 								self.db.char.Style.Speed = true
 							else
@@ -137,11 +143,11 @@ function TinyHunterStats:Options()
 					},
 					fr = {
 						name = STAT_FOCUS_REGEN,
-						desc = STAT_FOCUS_REGEN.." "..SHOW.."/"..HIDE,
+						desc = STAT_FOCUS_REGEN.." "..show.."/"..hide,
 						width = 'double',
 						type = 'toggle',
 						get = function() return self.db.char.Style.Fr end,
-						set = function(info, value)				
+						set = function(info, value)
 							if(value) then
 								self.db.char.Style.Fr = true
 							else
@@ -169,47 +175,13 @@ function TinyHunterStats:Options()
 						end,
 						order = 8,
 					},
-					hit = {
-						name = STAT_HIT_CHANCE,
-						desc = STAT_HIT_CHANCE.." "..SHOW.."/"..HIDE,
-						width = 'double',
-						type = 'toggle',
-						get = function() return self.db.char.Style.Hit end,
-						set = function(info, value)				
-							if(value) then
-								self.db.char.Style.Hit = true
-							else
-								self.db.char.Style.Hit = false
-							end
-							self:Stats()
-						end,
-						disabled = function() return InCombatLockdown() end,
-						order = 9,
-					},
-					hitcolor = {
-						name = "",
-						desc = "",
-						width = 'half',
-						type = 'color',
-						get = function()
-							local c = self.db.char.Color.hit
-							return c.r, c.g, c.b
-						end,
-						set = function(info, r, g, b)
-							local c = self.db.char.Color.hit
-							c.r, c.g, c.b = r, g, b
-							self:SetStringColors()
-							self:Stats()
-						end,
-						order = 10,
-					},
 					crit = {
-						name = RANGED_CRIT_CHANCE,
-						desc = RANGED_CRIT_CHANCE.." "..SHOW.."/"..HIDE,
+						name = CRIT_CHANCE,
+						desc = CRIT_CHANCE.." "..show.."/"..hide,
 						width = 'double',
 						type = 'toggle',
 						get = function() return self.db.char.Style.Crit end,
-						set = function(info, value)				
+						set = function(info, value)
 							if(value) then
 								self.db.char.Style.Crit = true
 							else
@@ -218,7 +190,7 @@ function TinyHunterStats:Options()
 							self:Stats()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 11,
+						order = 9,
 					},
 					critcolor = {
 						name = "",
@@ -235,7 +207,7 @@ function TinyHunterStats:Options()
 							self:SetStringColors()
 							self:Stats()
 						end,
-						order = 12,
+						order = 10,
 					},
 					header1 = {
 						name = "",
@@ -282,9 +254,9 @@ function TinyHunterStats:Options()
 						type = 'execute',
 						func = function()
 							for stat, c in pairs(self.defaults.char.Color) do
-								self.db.char.Color[stat].r = c.r 
+								self.db.char.Color[stat].r = c.r
 								self.db.char.Color[stat].g = c.g
-								self.db.char.Color[stat].b = c.b 								
+								self.db.char.Color[stat].b = c.b
 							end
 							self:SetStringColors()
 							self:Stats()
@@ -299,7 +271,7 @@ function TinyHunterStats:Options()
 				desc = L["Text settings"],
 				type = 'group',
 				order = 3,
-				args = {			
+				args = {
 					oocalpha = {
 						name = L["Text Alpha"].." "..L["out of combat"],
 						desc = L["Alpha of the text"].." ("..L["out of combat"]..")",
@@ -503,12 +475,12 @@ function TinyHunterStats:Options()
 					},
 				}
 			},
-			XStats = {
+			--[[XStats = {
 				name = "TinyXStats",
 				desc = "TinyXStats settings",
 				type = 'group',
 				order = 3,
-				args = {			
+				args = {
 					des1 = {
 						name = "|cFF00ff00You can use TinyXStats, (all in one Stats Addon).|r",
 						type = 'description',
@@ -553,7 +525,7 @@ function TinyHunterStats:Options()
 						order = 7,
 					},
 				}
-			},
+			},]]
 		},
 	}
 	return options
