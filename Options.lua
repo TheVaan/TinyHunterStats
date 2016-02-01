@@ -209,6 +209,40 @@ function TinyHunterStats:Options()
 						end,
 						order = 10,
 					},
+					multistrike = {
+						name = STAT_MULTISTRIKE,
+						desc = STAT_MULTISTRIKE.." "..show.."/"..hide,
+						width = 'double',
+						type = 'toggle',
+						get = function() return self.db.char.Style.Multistrike end,
+						set = function(info, value)
+							if(value) then
+								self.db.char.Style.Multistrike = true
+							else
+								self.db.char.Style.Multistrike = false
+							end
+							self:Stats()
+						end,
+						disabled = function() return InCombatLockdown() end,
+						order = 11,
+					},
+					multistrikecolor = {
+						name = "",
+						desc = "",
+						width = 'half',
+						type = 'color',
+						get = function()
+							local c = self.db.char.Color.multistrike
+							return c.r, c.g, c.b
+						end,
+						set = function(info, r, g, b)
+							local c = self.db.char.Color.multistrike
+							c.r, c.g, c.b = r, g, b
+							self:SetStringColors()
+							self:Stats()
+						end,
+						order = 12,
+					},
 					header1 = {
 						name = "",
 						type = 'header',

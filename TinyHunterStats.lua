@@ -396,7 +396,7 @@ function TinyHunterStats:Stats()
 				recordIsBroken = true
 			end
 		end
-		if (tonumber(multistrike) > tonumber(self.db.char[spec].HighestMultistirke)) then
+		if (tonumber(multistrike) > tonumber(self.db.char[spec].HighestMultistrike)) then
 			self.db.char[spec].HighestMultistrike = multistrike
 			if (self.db.char.RecordMsg == true) then
 				DEFAULT_CHAT_FRAME:AddMessage(recordbrocken..STAT_MULTISTRIKE..": |c00ffef00"..self.db.char[spec].HighestMultistrike.."|r")
@@ -520,39 +520,6 @@ function TinyHunterStats:Stats()
 		self.strings.frString:SetText("")
 		self.strings.frRecordString:SetText("")
 	end
-	if (style.Multistrike) then
-		local multistrikeTempString = ""
-		local multistrikeRecordTempString = ""
-		ldbString = ldbString..HexColor("multistrike")
-		if (style.labels) then
-			multistrikeTempString = multistrikeTempString..L["Mas:"].." "
-			ldbString = ldbString..L["Mas:"].." "
-		end
-		multistrikeTempString = multistrikeTempString..multistrike.."%"
-		ldbString = ldbString..multistrike.."% "
-		if (style.showRecords) then
-			ldbRecord = ldbRecord..HexColor("multistrike")
-			if (style.vertical) then
-				if (style.labels) then
-					ldbRecord = ldbRecord..STAT_MULTISTRIKE..": "
-				end
-				multistrikeRecordTempString = multistrikeRecordTempString.."("..self.db.char[spec].HighestMultistrike.."%)"
-				ldbRecord = ldbRecord..self.db.char[spec].HighestMultistrike.."% "
-			else
-				if (style.labels) then
-					multistrikeRecordTempString = multistrikeRecordTempString..STAT_MULTISTRIKE..": "
-					ldbRecord = ldbRecord..STAT_MULTISTRIKE..": "
-				end
-				multistrikeRecordTempString = multistrikeRecordTempString..self.db.char[spec].HighestMultistrike.."%"
-				ldbRecord = ldbRecord..self.db.char[spec].HighestMultistrike.."% "
-			end
-		end
-		self.strings.multistrikeString:SetText(multistrikeTempString)
-		self.strings.multistrikeRecordString:SetText(multistrikeRecordTempString)
-	else
-		self.strings.multistrikeString:SetText("")
-		self.strings.multistrikeRecordString:SetText("")
-	end
 	if (style.Crit == true) then
 		local critTempString = ""
 		local critRecordTempString = ""
@@ -585,6 +552,39 @@ function TinyHunterStats:Stats()
 	else
 		self.strings.critString:SetText("")
 		self.strings.critRecordString:SetText("")
+	end
+	if (style.Multistrike) then
+		local multistrikeTempString = ""
+		local multistrikeRecordTempString = ""
+		ldbString = ldbString..HexColor("multistrike")
+		if (style.labels) then
+			multistrikeTempString = multistrikeTempString..L["MS:"].." "
+			ldbString = ldbString..L["Mas:"].." "
+		end
+		multistrikeTempString = multistrikeTempString..multistrike.."%"
+		ldbString = ldbString..multistrike.."% "
+		if (style.showRecords) then
+			ldbRecord = ldbRecord..HexColor("multistrike")
+			if (style.vertical) then
+				if (style.labels) then
+					ldbRecord = ldbRecord..L["MS:"].." "
+				end
+				multistrikeRecordTempString = multistrikeRecordTempString.."("..self.db.char[spec].HighestMultistrike.."%)"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestMultistrike.."% "
+			else
+				if (style.labels) then
+					multistrikeRecordTempString = multistrikeRecordTempString..L["MS:"].." "
+					ldbRecord = ldbRecord..L["MS:"].." "
+				end
+				multistrikeRecordTempString = multistrikeRecordTempString..self.db.char[spec].HighestMultistrike.."%"
+				ldbRecord = ldbRecord..self.db.char[spec].HighestMultistrike.."% "
+			end
+		end
+		self.strings.multistrikeString:SetText(multistrikeTempString)
+		self.strings.multistrikeRecordString:SetText(multistrikeRecordTempString)
+	else
+		self.strings.multistrikeString:SetText("")
+		self.strings.multistrikeRecordString:SetText("")
 	end
 
 	if (style.LDBtext) then
