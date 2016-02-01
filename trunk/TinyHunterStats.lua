@@ -559,7 +559,7 @@ function TinyHunterStats:Stats()
 		ldbString = ldbString..HexColor("multistrike")
 		if (style.labels) then
 			multistrikeTempString = multistrikeTempString..L["MS:"].." "
-			ldbString = ldbString..L["Mas:"].." "
+			ldbString = ldbString..L["MS:"].." "
 		end
 		multistrikeTempString = multistrikeTempString..multistrike.."%"
 		ldbString = ldbString..multistrike.."% "
