@@ -67,21 +67,18 @@ TinyHunterStats.defaults = {
 			HighestAp = 0,
 			HighestCrit = "0.00",
 			FastestRg = 500,
-			HighestFr = "0.00",
-			HighestMultistrike = "0.00"
+			HighestFr = "0.00"
 		},
 		Spec2 = {
 			HighestAp = 0,
 			HighestCrit = "0.00",
 			FastestRg = 500,
-			HighestFr = "0.00",
-			HighestMultistrike = "0.00"
+			HighestFr = "0.00"
 		},
 		Style = {
 			Ap = true,
 			Crit = true,
 			Speed = false,
-			Multistrike = true,
 			Fr = true,
 			showRecords = true,
 			vertical = false,
@@ -108,11 +105,6 @@ TinyHunterStats.defaults = {
 				r = 0.9,
 				g = 0.9,
 				b = 0.9
-			},
-			multistrike = {
-				r = 0.9,
-				g = 0.0,
-				b = 0.0
 			}
 		},
 		DBver = 3
@@ -130,13 +122,11 @@ TinyHunterStats.strings = {
 	apString = TinyHunterStats.thsframe:CreateFontString(),
 	critString = TinyHunterStats.thsframe:CreateFontString(),
 	speedString = TinyHunterStats.thsframe:CreateFontString(),
-	multistrikeString = TinyHunterStats.thsframe:CreateFontString(),
 	frString = TinyHunterStats.thsframe:CreateFontString(),
 
 	apRecordString = TinyHunterStats.thsframe:CreateFontString(),
 	critRecordString = TinyHunterStats.thsframe:CreateFontString(),
 	speedRecordString = TinyHunterStats.thsframe:CreateFontString(),
-	multistrikeRecordString = TinyHunterStats.thsframe:CreateFontString(),
 	frRecordString = TinyHunterStats.thsframe:CreateFontString()
 }
 
@@ -145,13 +135,11 @@ function TinyHunterStats:SetStringColors()
 	self.strings.apString:SetTextColor(c.ap.r, c.ap.g, c.ap.b, 1.0)
 	self.strings.critString:SetTextColor(c.crit.r, c.crit.g, c.crit.b, 1.0)
 	self.strings.speedString:SetTextColor(c.speed.r, c.speed.g, c.speed.b, 1.0)
-	self.strings.multistrikeString:SetTextColor(c.multistrike.r, c.multistrike.g, c.multistrike.b, 1.0)
 	self.strings.frString:SetTextColor(c.fr.r, c.fr.g, c.fr.b, 1.0)
 
 	self.strings.apRecordString:SetTextColor(c.ap.r, c.ap.g, c.ap.b, 1.0)
 	self.strings.critRecordString:SetTextColor(c.crit.r, c.crit.g, c.crit.b, 1.0)
 	self.strings.speedRecordString:SetTextColor(c.speed.r, c.speed.g, c.speed.b, 1.0)
-	self.strings.multistrikeRecordString:SetTextColor(c.multistrike.r, c.multistrike.g, c.multistrike.b, 1.0)
 	self.strings.frRecordString:SetTextColor(c.fr.r, c.fr.g, c.fr.b, 1.0)
 end
 
@@ -161,25 +149,21 @@ function TinyHunterStats:SetTextAnchors()
 		self.strings.apString:SetPoint("TOPLEFT", self.thsframe,"TOPLEFT", offsetX, offsetY)
 		self.strings.speedString:SetPoint("TOPLEFT", self.strings.apString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.frString:SetPoint("TOPLEFT", self.strings.speedString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.multistrikeString:SetPoint("TOPLEFT", self.strings.frString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.critString:SetPoint("TOPLEFT", self.strings.multistrikeString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.critString:SetPoint("TOPLEFT", self.strings.frString, "TOPRIGHT", offsetX, offsetY)
 
 		self.strings.apRecordString:SetPoint("TOPLEFT", self.strings.apString, "BOTTOMLEFT")
 		self.strings.speedRecordString:SetPoint("TOPLEFT", self.strings.apRecordString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.frRecordString:SetPoint("TOPLEFT", self.strings.speedRecordString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.multistrikeRecordString:SetPoint("TOPLEFT", self.strings.frRecordString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.critRecordString:SetPoint("TOPLEFT", self.strings.multistrikeRecordString, "TOPRIGHT", offsetX, offsetY)
+		self.strings.critRecordString:SetPoint("TOPLEFT", self.strings.frRecordString, "TOPRIGHT", offsetX, offsetY)
 	else
 		self.strings.apString:SetPoint("TOPLEFT", self.thsframe,"TOPLEFT", offsetX, offsetY)
 		self.strings.speedString:SetPoint("TOPLEFT", self.strings.apString, "BOTTOMLEFT")
 		self.strings.frString:SetPoint("TOPLEFT", self.strings.speedString, "BOTTOMLEFT")
-		self.strings.multistrikeString:SetPoint("TOPLEFT", self.strings.frString, "BOTTOMLEFT")
-		self.strings.critString:SetPoint("TOPLEFT", self.strings.multistrikeString, "BOTTOMLEFT")
+		self.strings.critString:SetPoint("TOPLEFT", self.strings.frString, "BOTTOMLEFT")
 
 		self.strings.apRecordString:SetPoint("TOPLEFT", self.strings.apString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.speedRecordString:SetPoint("TOPLEFT", self.strings.speedString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.frRecordString:SetPoint("TOPLEFT", self.strings.frString, "TOPRIGHT", offsetX, offsetY)
-		self.strings.multistrikeRecordString:SetPoint("TOPLEFT", self.strings.multistrikeString, "TOPRIGHT", offsetX, offsetY)
 		self.strings.critRecordString:SetPoint("TOPLEFT", self.strings.critString, "TOPRIGHT", offsetX, offsetY)
 	end
 end
@@ -368,7 +352,6 @@ function TinyHunterStats:Stats()
 	local pow = base + buff + debuff
 	local crit = string.format("%.2f", GetRangedCritChance("player"))
 	local speed = GetSpeed()
-	local multistrike = string.format("%.2f", GetMultistrike())
 	local fr = string.format("%.2f", GetPowerRegen() or 0)
 	local spec = "Spec"..GetActiveSpecGroup()
 	local recordbrocken = "|cffFF0000"..L["Record broken!"]..": "
@@ -393,13 +376,6 @@ function TinyHunterStats:Stats()
 			self.db.char[spec].FastestRg = speed
 			if (self.db.char.RecordMsg == true) then
 				DEFAULT_CHAT_FRAME:AddMessage(recordbrocken..STAT_ATTACK_SPEED..": |c00ffef00"..self.db.char[spec].FastestRg.."|r")
-				recordIsBroken = true
-			end
-		end
-		if (tonumber(multistrike) > tonumber(self.db.char[spec].HighestMultistrike)) then
-			self.db.char[spec].HighestMultistrike = multistrike
-			if (self.db.char.RecordMsg == true) then
-				DEFAULT_CHAT_FRAME:AddMessage(recordbrocken..STAT_MULTISTRIKE..": |c00ffef00"..self.db.char[spec].HighestMultistrike.."|r")
 				recordIsBroken = true
 			end
 		end
@@ -552,39 +528,6 @@ function TinyHunterStats:Stats()
 	else
 		self.strings.critString:SetText("")
 		self.strings.critRecordString:SetText("")
-	end
-	if (style.Multistrike) then
-		local multistrikeTempString = ""
-		local multistrikeRecordTempString = ""
-		ldbString = ldbString..HexColor("multistrike")
-		if (style.labels) then
-			multistrikeTempString = multistrikeTempString..L["MS:"].." "
-			ldbString = ldbString..L["MS:"].." "
-		end
-		multistrikeTempString = multistrikeTempString..multistrike.."%"
-		ldbString = ldbString..multistrike.."% "
-		if (style.showRecords) then
-			ldbRecord = ldbRecord..HexColor("multistrike")
-			if (style.vertical) then
-				if (style.labels) then
-					ldbRecord = ldbRecord..L["MS:"].." "
-				end
-				multistrikeRecordTempString = multistrikeRecordTempString.."("..self.db.char[spec].HighestMultistrike.."%)"
-				ldbRecord = ldbRecord..self.db.char[spec].HighestMultistrike.."% "
-			else
-				if (style.labels) then
-					multistrikeRecordTempString = multistrikeRecordTempString..L["MS:"].." "
-					ldbRecord = ldbRecord..L["MS:"].." "
-				end
-				multistrikeRecordTempString = multistrikeRecordTempString..self.db.char[spec].HighestMultistrike.."%"
-				ldbRecord = ldbRecord..self.db.char[spec].HighestMultistrike.."% "
-			end
-		end
-		self.strings.multistrikeString:SetText(multistrikeTempString)
-		self.strings.multistrikeRecordString:SetText(multistrikeRecordTempString)
-	else
-		self.strings.multistrikeString:SetText("")
-		self.strings.multistrikeRecordString:SetText("")
 	end
 
 	if (style.LDBtext) then
