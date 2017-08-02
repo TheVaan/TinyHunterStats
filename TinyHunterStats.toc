@@ -1,4 +1,4 @@
-## Interface: 60200
+## Interface: 70100
 ## Title: TinyHunterStats
 ## Version: @project-version@
 ## Author: TheVaan & Marhu_
