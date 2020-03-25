@@ -82,8 +82,7 @@ TinyHunterStats.defaults = {
 			Fr = true,
 			showRecords = true,
 			vertical = false,
-			labels = false,
-			LDBtext = true
+			labels = false
 		},
 		Color = {
 			ap = {
@@ -194,16 +193,6 @@ function TinyHunterStats:SetFrameVisible()
 
 end
 
-function TinyHunterStats:SetBroker()
-
-	if self.db.char.Style.LDBtext then
-		THSBroker.label = ""
-	else
-		THSBroker.label = AddonName
-	end
-
-end
-
 function TinyHunterStats:InitializeFrame()
 	self.thsframe:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", self.db.char.xPosition, self.db.char.yPosition)
 	local font = media:Fetch("font", self.db.char.Font)
@@ -222,7 +211,6 @@ function TinyHunterStats:InitializeFrame()
 	self:SetStringColors()
 	self:SetDragScript()
 	self:SetFrameVisible()
-	self:SetBroker()
 	self:Stats()
 end
 
@@ -286,13 +274,11 @@ function SetActiveSpecGroup(...)
 end
 
 function TinyHunterStats:OnEvent(event, arg1)
+	if (event == "PLAYER_ENTERING_WORLD") then
+		self:UseTinyXStats()
+	end
 	if ((event == "PLAYER_REGEN_ENABLED") or (event == "PLAYER_ENTERING_WORLD")) then
 		self.thsframe:SetAlpha(self.db.char.outOfCombatAlpha)
-		--[[local weekday, month, day, year = CalendarGetDate()
-		if self.db.char.PostXStatsDay ~= day then
-			self.db.char.PostXStatsDay = day
-			self:UseTinyXStats()
-		end]]--
 	end
 	if (event == "PLAYER_REGEN_DISABLED") then
 		self.thsframe:SetAlpha(self.db.char.inCombatAlpha)
@@ -310,9 +296,9 @@ function TinyHunterStats:UseTinyXStats()
 	if self.Globaldb.NoXStatsPrint then return end
 
 	local text = {}
-	text[1] = "|cFF00ff00You can use TinyXStats, (all in one Stats Addon).|r"
-	text[2] = "http://www.curse.com/addons/wow/tinystats"
-	text[3] = "|cFF00ff00This will always be updated as the first.|r"
+	text[1] = "|cFF00ff00"..L["Please use TinyXStats, it's an all in one Stats Addon."].."|r"
+	text[2] = "https://curseforge.com/wow/addons/tinystats"
+	text[3] = "|cFF00ff00"..L["In future this will be updated first."].."|r"
 	for i = 1, 3 do
 		DEFAULT_CHAT_FRAME:AddMessage("|cFFCCCC99"..AddonName..": |r"..text[i])
 	end
@@ -530,9 +516,6 @@ function TinyHunterStats:Stats()
 		self.strings.critRecordString:SetText("")
 	end
 
-	if (style.LDBtext) then
-		THSBroker.text = ldbString..ldbRecord.."|r"
-	else
-		THSBroker.text = ""
-	end
+	THSBroker.text = ldbString..ldbRecord.."|r"
+	
 end

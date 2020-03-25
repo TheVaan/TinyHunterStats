@@ -390,23 +390,6 @@ function TinyHunterStats:Options()
 						disabled = function() return InCombatLockdown() end,
 						order = 7,
 					},
-					LDBtext = {
-						name = L["Broker Text"],
-						desc = L["Displays stats in the LDB text field."],
-						--width = 'full',
-						type = 'toggle',
-						get = function() return self.db.char.Style.LDBtext end,
-						set = function(info, value)
-							if(value) then
-								self.db.char.Style.LDBtext = true
-							else
-								self.db.char.Style.LDBtext = false
-							end
-							self:Stats()
-						end,
-						disabled = function() return InCombatLockdown() end,
-						order = 8
-					},
 					hide = {
 						name = L["Hide Frame"],
 						desc = L["Hide the text frame (to show stats only in the LDB text field)"],
@@ -421,7 +404,7 @@ function TinyHunterStats:Options()
 							self:SetFrameVisible()
 						end,
 						disabled = function() return InCombatLockdown() end,
-						order = 9
+						order = 8
 					},
 					spaceline4 = {
 						name = " ",
@@ -475,14 +458,14 @@ function TinyHunterStats:Options()
 					},
 				}
 			},
-			--[[XStats = {
+			XStats = {
 				name = "TinyXStats",
 				desc = "TinyXStats settings",
 				type = 'group',
 				order = 3,
 				args = {
 					des1 = {
-						name = "|cFF00ff00You can use TinyXStats, (all in one Stats Addon).|r",
+						name = "|cFF00ff00"..L["Please use TinyXStats, it's an all in one Stats Addon."].."|r",
 						type = 'description',
 						order = 1,
 					},
@@ -496,7 +479,7 @@ function TinyHunterStats:Options()
 						desc = "",
 						type = 'input',
 						width = "full",
-						get = function() return "http://www.curse.com/addons/wow/tinystats" end,
+						get = function() return "https://curseforge.com/wow/addons/tinystats" end,
 						set = function(_,val) end,
 						order = 3,
 					},
@@ -506,7 +489,7 @@ function TinyHunterStats:Options()
 						order = 4,
 					},
 					des3 = {
-						name = "|cFF00ff00This will always be updated as the first.|r",
+						name = "|cFF00ff00"..L["In future this will be updated first."].."|r",
 						type = 'description',
 						order = 5,
 					},
@@ -525,7 +508,7 @@ function TinyHunterStats:Options()
 						order = 7,
 					},
 				}
-			},]]
+			},
 		},
 	}
 	return options
