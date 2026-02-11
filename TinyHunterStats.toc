@@ -9,6 +9,7 @@
 ## SavedVariablesPerCharacter: TinyHunterStatsDB
 ## OptionalDeps: Ace3, LibDataBroker-1.1
 ## X-Curse-Project-ID: 23715
+## IconTexture: Interface\Icons\Ability_Racial_ShadowMeld
 
 #@no-lib-strip@
 Libs\LibStub\LibStub.lua
