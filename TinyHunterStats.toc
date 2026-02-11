@@ -1,17 +1,33 @@
-## Interface: 80300
+## Interface: 11508,20505,50503,110005
 ## Title: TinyHunterStats
-## Version: @project-version@
-## Author: TheVaan
 ## Notes: Shows your current Ranged Attack Power & Crit & Speed & Focus Regen.|n|cffeda55fBy TheVaan|r
 ## Notes-deDE: Zeigt wichtige Werte für deinen Jäger. (Angriffskraft, Crit, Geschwindigkeit, etc.)|n|cffeda55fBy TheVaan|r
+## Version: @project-version@
+## Author: TheVaan
+## X-Email: TheVaan@gmail.com
+## LoadSavedVariablesFirst: 1
 ## SavedVariablesPerCharacter: TinyHunterStatsDB
-## SavedVariables: TinyHStatsDB
-## OptionalDeps: AceAddon-3.0, AceConfig-3.0, AceConsole-3.0, AceDB-3.0, AceEvent-3.0, AceGUI-3.0, AceGUI-3.0-SharedMediaWidgets, AceLocale-3.0, AceTimer-3.0, CallbackHandler-1.0, LibDataBroker-1.1, LibSharedMedia-3.0, LibStub
+## OptionalDeps: Ace3, LibDataBroker-1.1
+## X-Curse-Project-ID: 23715
 
-embeds.xml
+#@no-lib-strip@
+Libs\LibStub\LibStub.lua
+Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+Libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+Libs\LibSharedMedia-3.0\lib.xml
+Libs\AceAddon-3.0\AceAddon-3.0.xml
+Libs\AceEvent-3.0\AceEvent-3.0.xml
+Libs\AceTimer-3.0\AceTimer-3.0.xml
+Libs\AceDB-3.0\AceDB-3.0.xml
+Libs\AceLocale-3.0\AceLocale-3.0.xml
+Libs\AceConsole-3.0\AceConsole-3.0.xml
+Libs\AceGUI-3.0\AceGUI-3.0.xml
+Libs\AceConfig-3.0\AceConfig-3.0.xml
+Libs\AceGUI-3.0-SharedMediaWidgets\widget.xml
+#@end-no-lib-strip@
 
-Localization\deDE.lua
 Localization\enUS.lua
+Localization\deDE.lua
 Localization\esES.lua
 Localization\esMX.lua
 Localization\frFR.lua
@@ -21,4 +37,5 @@ Localization\zhCN.lua
 Localization\zhTW.lua
 
 TinyHunterStats.lua
+Compat.lua
 Options.lua
