@@ -120,7 +120,7 @@ TinyHunterStats.defaults = {
     }
 }
 
-TinyHunterStats.frame = CreateFrame("Frame",AddonName.."Frame",UIParent)
+TinyHunterStats.frame = CreateFrame("Frame",AddonName.."Frame",UIParent, "BackdropTemplate")
 TinyHunterStats.frame:SetWidth(100)
 TinyHunterStats.frame:SetHeight(15)
 TinyHunterStats.frame:SetFrameStrata("BACKGROUND")
