@@ -1,4 +1,4 @@
-## Interface: 11509,20506,50504,120105
+## Interface: 11509,20506,50504,120105,16001
 ## Title: TinyHunterStats
 ## Notes: Shows your current Ranged Attack Power & Crit & Speed & Focus Regen.|n|cffeda55fBy TheVaan|r
 ## Notes-deDE: Zeigt wichtige Werte für deinen Jäger. (Angriffskraft, Crit, Geschwindigkeit, etc.)|n|cffeda55fBy TheVaan|r

@@ -224,15 +224,16 @@ function TinyHunterStats:LibSharedMedia_Registered()
     end
 end
 
--- Hook SetActiveSpecGroup if it exists
-if SetActiveSpecGroup then
-    local orgSetActiveSpecGroup = SetActiveSpecGroup
-    function SetActiveSpecGroup(...)
-        SpecChangedPause = GetTime() + 60
-        TinyHunterStats:ScheduleTimer("Stats", 62)
-        Debug("Set SpecChangedPause")
-        return orgSetActiveSpecGroup(...)
-    end
+-- Pause records while the spec group changes (SetActiveSpecGroup moved into C_SpecializationInfo)
+local function OnSetActiveSpecGroup()
+    SpecChangedPause = GetTime() + 60
+    TinyHunterStats:ScheduleTimer("Stats", 62)
+    Debug("Set SpecChangedPause")
+end
+if C_SpecializationInfo and C_SpecializationInfo.SetActiveSpecGroup then
+    hooksecurefunc(C_SpecializationInfo, "SetActiveSpecGroup", OnSetActiveSpecGroup)
+elseif SetActiveSpecGroup then
+    hooksecurefunc("SetActiveSpecGroup", OnSetActiveSpecGroup)
 end
 
 function TinyHunterStats:OnEvent(event, arg1)
