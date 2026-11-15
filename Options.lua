@@ -319,8 +319,8 @@ function TinyHunterStats:Options()
                         set = function(info, newValue)
                             self.db.char.Size = newValue
                             local font = media:Fetch("font", self.db.char.Font)
-                            if not self.string:SetFont(font, self.db.char.Size, self.db.char.FontEffect) then
-                                self.string:SetFont("Fonts\\FRIZQT__.TTF", self.db.char.Size, self.db.char.FontEffect)
+                            if not self.string:SetFont(font, self.db.char.Size, self:GetFontFlags()) then
+                                self.string:SetFont("Fonts\\FRIZQT__.TTF", self.db.char.Size, self:GetFontFlags())
                             end
                             self:InitializeFrame()
                         end,
@@ -334,8 +334,8 @@ function TinyHunterStats:Options()
                         set = function(info, newValue)
                             self.db.char.Font = newValue
                             local font = media:Fetch("font", self.db.char.Font)
-                            if not self.string:SetFont(font, self.db.char.Size, self.db.char.FontEffect) then
-                                self.string:SetFont("Fonts\\FRIZQT__.TTF", self.db.char.Size, self.db.char.FontEffect)
+                            if not self.string:SetFont(font, self.db.char.Size, self:GetFontFlags()) then
+                                self.string:SetFont("Fonts\\FRIZQT__.TTF", self.db.char.Size, self:GetFontFlags())
                             end
                         end,
                         values = self.fonts,
@@ -349,8 +349,8 @@ function TinyHunterStats:Options()
                         set = function(info, newValue)
                             self.db.char.FontEffect = newValue
                             local font = media:Fetch("font", self.db.char.Font)
-                            if not self.string:SetFont(font, self.db.char.Size, self.db.char.FontEffect) then
-                                self.string:SetFont("Fonts\\FRIZQT__.TTF", self.db.char.Size, self.db.char.FontEffect)
+                            if not self.string:SetFont(font, self.db.char.Size, self:GetFontFlags()) then
+                                self.string:SetFont("Fonts\\FRIZQT__.TTF", self.db.char.Size, self:GetFontFlags())
                             end
                         end,
                         values = self.fonteffects,
